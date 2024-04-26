@@ -1,12 +1,13 @@
-import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { compare, genSalt, hash } from 'bcrypt';
 import { Document } from 'mongoose';
+import { GetContactInfoDto } from '../users/user-dto/get-contactInfo.dto';
+import { randomUUID } from 'crypto';
 
 const SALT_WORK_FACTOR = 10;
 
 export interface UserMethods {
   generateToken: () => void;
-
   checkPassword(password: string): Promise<boolean>;
 }
 
@@ -27,26 +28,23 @@ export class User {
   @Prop({ required: true })
   lastname: string;
 
-  @Prop(
-    raw({
-      mobile: { type: String, required: true, unique: true },
-      city: { type: String, required: true },
-      street: { type: String, required: true },
-    }),
-  )
-  contact: { mobile: string; city: string; street: string };
+  @Prop({ type: GetContactInfoDto })
+  contactInfo: GetContactInfoDto;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   photo: string;
 
-  @Prop({ required: true, type: Date })
+  @Prop({ required: true })
+  position: string;
+
+  @Prop({ required: true, type: Date, default: new Date() })
   startDate: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.methods.generateToken = function () {
-  this.token = crypto.randomUUID();
+  this.token = randomUUID();
 };
 
 UserSchema.methods.checkPassword = function (password: string) {
@@ -67,4 +65,4 @@ UserSchema.set('toJSON', {
   },
 });
 
-export type UserDocument = User & Document;
+export type UserDocument = User & Document & UserMethods;
