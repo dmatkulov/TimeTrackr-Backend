@@ -33,6 +33,7 @@ export class UsersService {
         photo: file ? file.filename : null,
         contactInfo: createUserDto.contactInfo,
         position: createUserDto.position,
+        role: createUserDto.role,
         startDate: createUserDto.startDate,
       });
 
@@ -87,6 +88,7 @@ export class UsersService {
         photo: file ? file.filename : null,
         contactInfo: createUserDto.contactInfo,
         position: createUserDto.position,
+        role: createUserDto.role,
         startDate: createUserDto.startDate,
       };
 

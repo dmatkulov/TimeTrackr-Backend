@@ -3,6 +3,7 @@ import { compare, genSalt, hash } from 'bcrypt';
 import { Document } from 'mongoose';
 import { GetContactInfoDto } from '../users/user-dto/get-contactInfo.dto';
 import { randomUUID } from 'crypto';
+import { Role } from '../enums/role.enum';
 
 const SALT_WORK_FACTOR = 10;
 
@@ -28,7 +29,7 @@ export class User {
   @Prop({ required: true })
   lastname: string;
 
-  @Prop({ type: GetContactInfoDto })
+  @Prop({ required: true, type: GetContactInfoDto })
   contactInfo: GetContactInfoDto;
 
   @Prop({ required: false })
@@ -36,6 +37,12 @@ export class User {
 
   @Prop({ required: true })
   position: string;
+
+  @Prop({
+    required: true,
+    default: Role.Employee,
+  })
+  role: Role;
 
   @Prop({ required: true, type: Date, default: new Date() })
   startDate: Date;

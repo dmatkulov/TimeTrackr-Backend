@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
@@ -20,11 +21,16 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './user-dto/create-user.dto';
 import { ParseObjectIdPipe } from 'nestjs-object-id';
 import { Types } from 'mongoose';
+import { Roles } from '../decorators/roles.decorator';
+import { Role } from '../enums/role.enum';
+import { RolesGuard } from '../auth/roles.guard';
 
 @Controller('staff')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
+  @Roles(Role.Admin)
+  @UseGuards(RolesGuard)
   @Post('register-user')
   @UsePipes(new ValidationPipe())
   @UseInterceptors(
@@ -46,16 +52,22 @@ export class UsersController {
     return this.userService.createOne(file, createUserDto);
   }
 
+  @Roles(Role.Admin)
+  @UseGuards(RolesGuard)
   @Get()
   getAll() {
     return this.userService.getAll();
   }
 
+  @Roles(Role.Admin)
+  @UseGuards(RolesGuard)
   @Get('info/:id')
   getOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
     return this.userService.getOne(id);
   }
 
+  @Roles(Role.Admin)
+  @UseGuards(RolesGuard)
   @Patch('edit/:id')
   @UsePipes(new ValidationPipe())
   @UseInterceptors(
@@ -78,6 +90,8 @@ export class UsersController {
     return this.userService.updateOne(id, file, createUserDto);
   }
 
+  @Roles(Role.Admin)
+  @UseGuards(RolesGuard)
   @Delete('delete/:id')
   deleteOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
     return this.userService.deleteOne(id);
