@@ -43,7 +43,7 @@ export class UsersController {
     return this.userService.createUser(file, createUserDto);
   }
 
-  @Delete('/:id')
+  @Delete('delete/:id')
   async deleteOne(@Param('id') id: string) {
     try {
       await this.userService.deleteOne(id);
