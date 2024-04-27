@@ -2,6 +2,7 @@ import {
   Body,
   Injectable,
   NotFoundException,
+  Req,
   UnprocessableEntityException,
   UploadedFile,
 } from '@nestjs/common';
@@ -12,6 +13,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../schemas/user.schema';
 import mongoose, { Model, Types } from 'mongoose';
 import { CreateUserDto } from './user-dto/create-user.dto';
+import { Request } from 'express';
 
 @Injectable()
 export class UsersService {
@@ -47,6 +49,36 @@ export class UsersService {
 
       throw e;
     }
+  }
+
+  async login(@Req() req: Request) {
+    return req.user;
+  }
+
+  async logOut(@Req() req: Request) {
+    const headerValue = req.get('Authorization');
+    const successMessage = { message: 'Пользователь вышел из системы' };
+
+    if (!headerValue) {
+      return successMessage;
+    }
+
+    const [_bearer, token] = headerValue.split(' ');
+
+    if (!token) {
+      return successMessage;
+    }
+
+    const user = await this.userModel.findOne({ token });
+
+    if (!user) {
+      return successMessage;
+    }
+
+    user.generateToken();
+    await user.save();
+
+    return successMessage;
   }
 
   async getAll() {

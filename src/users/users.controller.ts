@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -24,6 +25,8 @@ import { Types } from 'mongoose';
 import { Roles } from '../decorators/roles.decorator';
 import { Role } from '../enums/role.enum';
 import { RolesGuard } from '../auth/roles.guard';
+import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
 
 @Controller('staff')
 export class UsersController {
@@ -50,6 +53,12 @@ export class UsersController {
     @Body() createUserDto: CreateUserDto,
   ) {
     return this.userService.createOne(file, createUserDto);
+  }
+
+  @UseGuards(AuthGuard('local'))
+  @Post('sessions')
+  login(@Req() req: Request) {
+    return this.userService.login(req);
   }
 
   @Roles(Role.Admin)
