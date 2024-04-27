@@ -1,9 +1,10 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
+  Get,
   Param,
+  Patch,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -17,6 +18,8 @@ import { randomUUID } from 'crypto';
 
 import { UsersService } from './users.service';
 import { CreateUserDto } from './user-dto/create-user.dto';
+import { ParseObjectIdPipe } from 'nestjs-object-id';
+import { Types } from 'mongoose';
 
 @Controller('staff')
 export class UsersController {
@@ -43,12 +46,35 @@ export class UsersController {
     return this.userService.createUser(file, createUserDto);
   }
 
+  @Get('info/:id')
+  getOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
+    return this.userService.getOne(id);
+  }
+
+  @Patch('edit/:id')
+  @UsePipes(new ValidationPipe())
+  @UseInterceptors(
+    FileInterceptor('photo', {
+      storage: diskStorage({
+        destination: './public/uploads/staff',
+        filename: (_req, file, cb) => {
+          const extension = path.extname(file.originalname);
+          const filename = path.join('artists', randomUUID() + extension);
+          cb(null, filename);
+        },
+      }),
+    }),
+  )
+  updateOne(
+    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createUserDto: CreateUserDto,
+  ) {
+    return this.userService.updateOne(id, file, createUserDto);
+  }
+
   @Delete('delete/:id')
-  async deleteOne(@Param('id') id: string) {
-    try {
-      await this.userService.deleteOne(id);
-    } catch (e) {
-      throw new BadRequestException('Неверный формат ID');
-    }
+  deleteOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
+    return this.userService.deleteOne(id);
   }
 }
