@@ -1,5 +1,6 @@
 import {
   IsEmail,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -7,6 +8,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { GetContactInfoDto } from './get-contactInfo.dto';
+import { Role } from '../../enums/role.enum';
 
 export class CreateUserDto {
   @IsEmail()
@@ -35,6 +37,10 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   position: string;
+
+  @IsOptional()
+  @IsEnum(Role)
+  role: Role;
 
   @Type(() => Date)
   @IsNotEmpty()
