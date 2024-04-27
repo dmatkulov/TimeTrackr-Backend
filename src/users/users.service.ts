@@ -20,7 +20,7 @@ export class UsersService {
     private userModel: Model<UserDocument>,
   ) {}
 
-  async createUser(
+  async createOne(
     @UploadedFile() file: Express.Multer.File,
     @Body() createUserDto: CreateUserDto,
   ) {
@@ -46,6 +46,10 @@ export class UsersService {
 
       throw e;
     }
+  }
+
+  async getAll() {
+    return this.userModel.find();
   }
 
   async getOne(id: Types.ObjectId) {

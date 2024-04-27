@@ -39,11 +39,16 @@ export class UsersController {
       }),
     }),
   )
-  createUser(
+  createOne(
     @UploadedFile() file: Express.Multer.File,
     @Body() createUserDto: CreateUserDto,
   ) {
-    return this.userService.createUser(file, createUserDto);
+    return this.userService.createOne(file, createUserDto);
+  }
+
+  @Get()
+  getAll() {
+    return this.userService.getAll();
   }
 
   @Get('info/:id')
