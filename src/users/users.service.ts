@@ -42,4 +42,8 @@ export class UsersService {
       throw e;
     }
   }
+
+  async deleteOne(id: string) {
+    return this.userModel.findOneAndDelete({ _id: id });
+  }
 }

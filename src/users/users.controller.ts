@@ -1,6 +1,9 @@
 import {
+  BadRequestException,
   Body,
   Controller,
+  Delete,
+  Param,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -38,5 +41,14 @@ export class UsersController {
     @Body() createUserDto: CreateUserDto,
   ) {
     return this.userService.createUser(file, createUserDto);
+  }
+
+  @Delete('/:id')
+  async deleteOne(@Param('id') id: string) {
+    try {
+      await this.userService.deleteOne(id);
+    } catch (e) {
+      throw new BadRequestException('Неверный формат ID');
+    }
   }
 }
