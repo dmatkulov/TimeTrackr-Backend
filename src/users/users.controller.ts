@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import path from 'path';
+import * as path from 'path';
 import { randomUUID } from 'crypto';
 
 import { UsersService } from './users.service';
@@ -33,17 +33,16 @@ import { TokenAuthGuard } from '../token/token.guard';
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
-  @Roles(Role.Admin)
-  @UseGuards(RolesGuard, TokenAuthGuard)
+  @UseGuards(TokenAuthGuard)
   @Post('register-user')
   @UsePipes(new ValidationPipe())
   @UseInterceptors(
     FileInterceptor('photo', {
       storage: diskStorage({
-        destination: './public/uploads/staff',
+        destination: './public/uploads/',
         filename: (_req, file, cb) => {
           const extension = path.extname(file.originalname);
-          const filename = path.join('users', randomUUID() + extension);
+          const filename = path.join('staff', randomUUID() + extension);
           cb(null, filename);
         },
       }),
@@ -83,10 +82,10 @@ export class UsersController {
   @UseInterceptors(
     FileInterceptor('photo', {
       storage: diskStorage({
-        destination: './public/uploads/staff',
+        destination: './public/uploads/',
         filename: (_req, file, cb) => {
           const extension = path.extname(file.originalname);
-          const filename = path.join('users', randomUUID() + extension);
+          const filename = path.join('staff', randomUUID() + extension);
           cb(null, filename);
         },
       }),
