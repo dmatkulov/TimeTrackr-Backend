@@ -14,6 +14,12 @@ export class FixturesService {
     private readonly userModel: Model<UserDocument>,
   ) {}
 
+  async seedDatabase() {
+    await this.connect();
+    await this.seedUsers();
+    await this.closeDatabase();
+  }
+
   async connect() {
     console.log('Connecting to database...');
 

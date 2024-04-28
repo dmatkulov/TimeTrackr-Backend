@@ -10,6 +10,7 @@ import { PassportModule } from '@nestjs/passport';
 import { RolesGuard } from './auth/roles.guard';
 import { LocalStrategy } from './auth/local.strategy';
 import { FixturesService } from './fixtures/fixtures.service';
+import { SeedService } from './fixtures/seed.service';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { FixturesService } from './fixtures/fixtures.service';
     LocalStrategy,
     RolesGuard,
     FixturesService,
+    SeedService,
   ],
 })
 export class AppModule {}
