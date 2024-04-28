@@ -1,6 +1,7 @@
 import {
   IsEmail,
   IsEnum,
+  IsMongoId,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -9,6 +10,7 @@ import {
 import { Type } from 'class-transformer';
 import { GetContactInfoDto } from './get-contactInfo.dto';
 import { Role } from '../../enums/role.enum';
+import mongoose from 'mongoose';
 
 export class CreateUserDto {
   @IsEmail()
@@ -34,9 +36,9 @@ export class CreateUserDto {
   @Type(() => GetContactInfoDto)
   contactInfo: GetContactInfoDto;
 
-  @IsString()
   @IsNotEmpty()
-  position: string;
+  @IsMongoId()
+  position: mongoose.Schema.Types.ObjectId;
 
   @IsOptional()
   @IsEnum(Role)

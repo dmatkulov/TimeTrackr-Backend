@@ -12,11 +12,15 @@ import { LocalStrategy } from './auth/local.strategy';
 import { FixturesService } from './fixtures/fixtures.service';
 import { SeedService } from './fixtures/seed.service';
 import { CommandModule } from 'nestjs-command';
+import { Position, PositionSchema } from './schemas/position.schema';
 
 @Module({
   imports: [
     MongooseModule.forRoot('mongodb://localhost/trckr'),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: Position.name, schema: PositionSchema },
+    ]),
     PassportModule,
     CommandModule,
   ],

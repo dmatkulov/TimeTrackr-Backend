@@ -1,9 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { compare, genSalt, hash } from 'bcrypt';
-import { Document } from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 import { GetContactInfoDto } from '../users/user-dto/get-contactInfo.dto';
 import { randomUUID } from 'crypto';
 import { Role } from '../enums/role.enum';
+import { Position } from './position.schema';
 
 const SALT_WORK_FACTOR = 10;
 
@@ -35,8 +36,8 @@ export class User {
   @Prop({ required: false })
   photo: string;
 
-  @Prop({ required: true })
-  position: string;
+  @Prop({ ref: Position.name, required: true })
+  position: mongoose.Schema.Types.ObjectId;
 
   @Prop({
     required: true,
