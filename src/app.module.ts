@@ -13,6 +13,8 @@ import { FixturesService } from './fixtures/fixtures.service';
 import { SeedService } from './fixtures/seed.service';
 import { CommandModule } from 'nestjs-command';
 import { Position, PositionSchema } from './schemas/position.schema';
+import { PositionService } from './position/position.service';
+import { PositionController } from './position/position.controller';
 
 @Module({
   imports: [
@@ -24,7 +26,7 @@ import { Position, PositionSchema } from './schemas/position.schema';
     PassportModule,
     CommandModule,
   ],
-  controllers: [AppController, UsersController],
+  controllers: [AppController, UsersController, PositionController],
   providers: [
     AppService,
     UsersService,
@@ -33,6 +35,7 @@ import { Position, PositionSchema } from './schemas/position.schema';
     RolesGuard,
     FixturesService,
     SeedService,
+    PositionService,
   ],
 })
 export class AppModule {}

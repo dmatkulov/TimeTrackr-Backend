@@ -12,7 +12,7 @@ import { InjectModel } from '@nestjs/mongoose';
 
 import { User, UserDocument } from '../schemas/user.schema';
 import mongoose, { Model, Types } from 'mongoose';
-import { CreateUserDto } from './user-dto/create-user.dto';
+import { CreateUserDto } from '../dto/create-user.dto';
 import { Request } from 'express';
 
 @Injectable()

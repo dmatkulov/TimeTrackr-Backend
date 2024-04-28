@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { GetContactInfoDto } from './get-contactInfo.dto';
-import { Role } from '../../enums/role.enum';
+import { Role } from '../enums/role.enum';
 import mongoose from 'mongoose';
 
 export class CreateUserDto {

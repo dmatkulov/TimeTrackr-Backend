@@ -19,7 +19,7 @@ import path from 'path';
 import { randomUUID } from 'crypto';
 
 import { UsersService } from './users.service';
-import { CreateUserDto } from './user-dto/create-user.dto';
+import { CreateUserDto } from '../dto/create-user.dto';
 import { ParseObjectIdPipe } from 'nestjs-object-id';
 import { Types } from 'mongoose';
 import { Roles } from '../decorators/roles.decorator';
@@ -43,7 +43,7 @@ export class UsersController {
         destination: './public/uploads/staff',
         filename: (_req, file, cb) => {
           const extension = path.extname(file.originalname);
-          const filename = path.join('artists', randomUUID() + extension);
+          const filename = path.join('users', randomUUID() + extension);
           cb(null, filename);
         },
       }),
@@ -51,9 +51,9 @@ export class UsersController {
   )
   createOne(
     @UploadedFile() file: Express.Multer.File,
-    @Body() createUserDto: CreateUserDto,
+    @Body() dto: CreateUserDto,
   ) {
-    return this.userService.createOne(file, createUserDto);
+    return this.userService.createOne(file, dto);
   }
 
   @UseGuards(AuthGuard('local'))
@@ -86,7 +86,7 @@ export class UsersController {
         destination: './public/uploads/staff',
         filename: (_req, file, cb) => {
           const extension = path.extname(file.originalname);
-          const filename = path.join('artists', randomUUID() + extension);
+          const filename = path.join('users', randomUUID() + extension);
           cb(null, filename);
         },
       }),
@@ -95,9 +95,9 @@ export class UsersController {
   updateOne(
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
     @UploadedFile() file: Express.Multer.File,
-    @Body() createUserDto: CreateUserDto,
+    @Body() dto: CreateUserDto,
   ) {
-    return this.userService.updateOne(id, file, createUserDto);
+    return this.userService.updateOne(id, file, dto);
   }
 
   @Roles(Role.Admin)

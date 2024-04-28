@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { compare, genSalt, hash } from 'bcrypt';
 import mongoose, { Document } from 'mongoose';
-import { GetContactInfoDto } from '../users/user-dto/get-contactInfo.dto';
+import { GetContactInfoDto } from '../dto/get-contactInfo.dto';
 import { randomUUID } from 'crypto';
 import { Role } from '../enums/role.enum';
 import { Position } from './position.schema';
