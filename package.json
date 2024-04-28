@@ -9,6 +9,7 @@
     "build": "/node_modules/.bin/nest build",
     "start": "/node_modules/.bin/nest start",
     "dev": "node_modules/.bin/nest start --watch",
+    "seed": "npx nestjs-command seed",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "lint": "node_modules/.bin/eslint \"{src,apps,libs,test}/**/*.ts\" --fix",

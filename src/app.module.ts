@@ -11,12 +11,14 @@ import { RolesGuard } from './auth/roles.guard';
 import { LocalStrategy } from './auth/local.strategy';
 import { FixturesService } from './fixtures/fixtures.service';
 import { SeedService } from './fixtures/seed.service';
+import { CommandModule } from 'nestjs-command';
 
 @Module({
   imports: [
     MongooseModule.forRoot('mongodb://localhost/trckr'),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     PassportModule,
+    CommandModule,
   ],
   controllers: [AppController, UsersController],
   providers: [
