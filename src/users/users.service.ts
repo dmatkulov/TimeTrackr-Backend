@@ -1,10 +1,7 @@
 import {
-  Body,
   Injectable,
   NotFoundException,
-  Req,
   UnprocessableEntityException,
-  UploadedFile,
 } from '@nestjs/common';
 import path from 'path';
 import fs from 'fs';
@@ -22,10 +19,7 @@ export class UsersService {
     private userModel: Model<UserDocument>,
   ) {}
 
-  async createOne(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() createUserDto: CreateUserDto,
-  ) {
+  async createOne(file: Express.Multer.File, createUserDto: CreateUserDto) {
     try {
       const user = new this.userModel({
         email: createUserDto.email,
@@ -51,11 +45,11 @@ export class UsersService {
     }
   }
 
-  async login(@Req() req: Request) {
+  async login(req: Request) {
     return req.user;
   }
 
-  async logOut(@Req() req: Request) {
+  async logOut(req: Request) {
     const headerValue = req.get('Authorization');
     const successMessage = { message: 'Пользователь вышел из системы' };
 
@@ -97,8 +91,8 @@ export class UsersService {
 
   async updateOne(
     id: Types.ObjectId,
-    @UploadedFile() file: Express.Multer.File,
-    @Body() createUserDto: CreateUserDto,
+    file: Express.Multer.File,
+    createUserDto: CreateUserDto,
   ) {
     const user = await this.userModel.findById(id);
 

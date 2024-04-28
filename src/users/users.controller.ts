@@ -106,4 +106,10 @@ export class UsersController {
   deleteOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
     return this.userService.deleteOne(id);
   }
+
+  @UseGuards(RolesGuard, TokenAuthGuard)
+  @Delete('sessions')
+  logOut(@Req() req: Request) {
+    return this.userService.logOut(req);
+  }
 }
