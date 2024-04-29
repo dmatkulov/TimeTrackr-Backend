@@ -16,6 +16,8 @@ import { Position, PositionSchema } from './schemas/position.schema';
 import { PositionService } from './position/position.service';
 import { PositionController } from './position/position.controller';
 import { Task, TaskSchema } from './schemas/task.schema';
+import { TasksService } from './tasks/tasks.service';
+import { TasksController } from './tasks/tasks.controller';
 
 @Module({
   imports: [
@@ -28,7 +30,12 @@ import { Task, TaskSchema } from './schemas/task.schema';
     PassportModule,
     CommandModule,
   ],
-  controllers: [AppController, UsersController, PositionController],
+  controllers: [
+    AppController,
+    UsersController,
+    PositionController,
+    TasksController,
+  ],
   providers: [
     AppService,
     UsersService,
@@ -38,6 +45,7 @@ import { Task, TaskSchema } from './schemas/task.schema';
     FixturesService,
     SeedService,
     PositionService,
+    TasksService,
   ],
 })
 export class AppModule {}

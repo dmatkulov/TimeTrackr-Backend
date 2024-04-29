@@ -1,9 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { User } from './user.schema';
 import mongoose, { Document } from 'mongoose';
-import { ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
-import { GetTasksDto } from '../dto/get-tasks.dto';
+import { GetTaskInfoDto } from '../dto/get-taskInfo.dto';
 
 @Schema()
 export class Task {
@@ -13,9 +11,8 @@ export class Task {
   @Prop({ required: true, type: Date, default: new Date() })
   executionDate: Date;
 
-  @ValidateNested({ each: true })
-  @Type(() => GetTasksDto)
-  tasks: GetTasksDto[];
+  @Prop({ required: true, type: GetTaskInfoDto })
+  tasks: GetTaskInfoDto[];
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);
