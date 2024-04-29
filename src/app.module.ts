@@ -15,6 +15,7 @@ import { CommandModule } from 'nestjs-command';
 import { Position, PositionSchema } from './schemas/position.schema';
 import { PositionService } from './position/position.service';
 import { PositionController } from './position/position.controller';
+import { Task, TaskSchema } from './schemas/task.schema';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { PositionController } from './position/position.controller';
     MongooseModule.forFeature([
       { name: Position.name, schema: PositionSchema },
     ]),
+    MongooseModule.forFeature([{ name: Task.name, schema: TaskSchema }]),
     PassportModule,
     CommandModule,
   ],
