@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { randomUUID } from 'crypto';
 import { Role } from '../enums/role.enum';
 import { Position } from '../schemas/position.schema';
+import { Task, TaskDocument } from '../schemas/task.schema';
 
 @Injectable()
 export class FixturesService {
@@ -14,6 +15,9 @@ export class FixturesService {
 
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
+
+    @InjectModel(Task.name)
+    private readonly taskModel: Model<TaskDocument>,
   ) {}
 
   async seedDatabase() {
@@ -31,7 +35,7 @@ export class FixturesService {
       { name: 'Бэкенд-разработчик (Backend Developer)' },
     );
 
-    await this.userModel.create(
+    const users = await this.userModel.create(
       {
         email: 'admin@gmail.com',
         password: '123',
@@ -111,6 +115,48 @@ export class FixturesService {
         roles: Role.Employee,
         token: randomUUID(),
         startDate: '2024-01-27T12:00:00.000+00:00',
+      },
+    );
+
+    await this.taskModel.create(
+      {
+        userId: users[1]._id,
+        executionDate: '2018-04-27T12:00:00.000+00:00',
+        tasks: [
+          {
+            startTime: 'today3',
+            endTime: 'tomorrow2',
+            title: 'Test title',
+            description: 'Test description',
+            label: 'Разработка',
+          },
+        ],
+      },
+      {
+        userId: users[1]._id,
+        executionDate: '2018-04-27T12:00:00.000+00:00',
+        tasks: [
+          {
+            startTime: 'today2',
+            endTime: 'tomorrow3',
+            title: 'Test title2',
+            description: 'Test description2',
+            label: 'Разработка',
+          },
+        ],
+      },
+      {
+        userId: users[2]._id,
+        executionDate: '2021-04-27T12:00:00.000+00:00',
+        tasks: [
+          {
+            startTime: 'yesterday',
+            endTime: 'today',
+            title: 'Test title2',
+            description: 'Test description2',
+            label: 'Разработка',
+          },
+        ],
       },
     );
   }

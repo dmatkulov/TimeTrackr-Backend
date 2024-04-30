@@ -16,7 +16,6 @@ import { UserDocument } from '../schemas/user.schema';
 import { CreateTaskDto } from '../dto/create-task.dto';
 import { Roles } from '../decorators/roles.decorator';
 import { Role } from '../enums/role.enum';
-import { TaskQueryDto } from '../dto/task-query.dto';
 
 @Controller('tasks')
 export class TasksController {
@@ -32,7 +31,11 @@ export class TasksController {
 
   @UseGuards(TokenAuthGuard)
   @Get()
-  getAll(@GetUser() user: UserDocument, @Query('query') query: TaskQueryDto) {
-    return this.tasksService.getAll(user, query);
+  getAll(
+    @GetUser() user: UserDocument,
+    @Query('userId') userId: string,
+    @Query('date') date: string,
+  ) {
+    return this.tasksService.getAll(user, userId, date);
   }
 }
