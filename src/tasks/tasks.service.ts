@@ -4,6 +4,8 @@ import { Task, TaskDocument } from '../schemas/task.schema';
 import mongoose, { FilterQuery, Model } from 'mongoose';
 import { UserDocument } from '../schemas/user.schema';
 import { CreateTaskDto } from '../dto/create-task.dto';
+import { Role } from '../enums/role.enum';
+import { TaskQueryDto } from '../dto/task-query.dto';
 
 @Injectable()
 export class TasksService {
@@ -30,10 +32,11 @@ export class TasksService {
     }
   }
 
-  async getAll(user: UserDocument, userId: string, date: string) {
+  async getAll(user: UserDocument, query: TaskQueryDto) {
     let filter: FilterQuery<TaskDocument> = {};
-    const isAdmin = user.role === 'admin';
-    const isEmployee = user.role === 'employee';
+    const { userId, date } = query;
+    const isAdmin = user.roles.includes(Role.Admin);
+    const isEmployee = user.roles.includes(Role.Employee);
 
     if (isAdmin) {
       filter = {};
@@ -51,6 +54,10 @@ export class TasksService {
 
     if (isEmployee) {
       filter = { userId: user._id };
+
+      if (date) {
+        filter = { userId: user._id, executionDate: date };
+      }
     }
 
     return this.taskModel.find(filter);

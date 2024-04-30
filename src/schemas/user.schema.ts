@@ -43,7 +43,7 @@ export class User {
     required: true,
     default: Role.Employee,
   })
-  role: Role;
+  roles: Role[];
 
   @Prop({ required: true, type: Date, default: new Date() })
   startDate: Date;

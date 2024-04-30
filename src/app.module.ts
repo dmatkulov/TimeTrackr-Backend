@@ -18,6 +18,7 @@ import { PositionController } from './position/position.controller';
 import { Task, TaskSchema } from './schemas/task.schema';
 import { TasksService } from './tasks/tasks.service';
 import { TasksController } from './tasks/tasks.controller';
+import { TokenAuthGuard } from './auth/token.guard';
 
 @Module({
   imports: [
@@ -38,10 +39,11 @@ import { TasksController } from './tasks/tasks.controller';
   ],
   providers: [
     AppService,
-    UsersService,
     AuthService,
     LocalStrategy,
     RolesGuard,
+    TokenAuthGuard,
+    UsersService,
     FixturesService,
     SeedService,
     PositionService,

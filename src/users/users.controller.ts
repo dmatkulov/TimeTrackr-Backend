@@ -27,15 +27,16 @@ import { Role } from '../enums/role.enum';
 import { RolesGuard } from '../auth/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
-import { TokenAuthGuard } from '../token/token.guard';
+import { TokenAuthGuard } from '../auth/token.guard';
 
 @Controller('staff')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
-  @UseGuards(TokenAuthGuard)
-  @Post('register-user')
+  @Roles(Role.Admin)
+  @UseGuards(TokenAuthGuard, RolesGuard)
   @UsePipes(new ValidationPipe())
+  @Post('register-user')
   @UseInterceptors(
     FileInterceptor('photo', {
       storage: diskStorage({
@@ -62,21 +63,21 @@ export class UsersController {
   }
 
   @Roles(Role.Admin)
-  @UseGuards(RolesGuard, TokenAuthGuard)
+  @UseGuards(TokenAuthGuard, RolesGuard)
   @Get()
   getAll() {
     return this.userService.getAll();
   }
 
   @Roles(Role.Admin)
-  @UseGuards(RolesGuard, TokenAuthGuard)
+  @UseGuards(TokenAuthGuard, RolesGuard)
   @Get('info/:id')
   getOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
     return this.userService.getOne(id);
   }
 
   @Roles(Role.Admin)
-  @UseGuards(RolesGuard, TokenAuthGuard)
+  @UseGuards(TokenAuthGuard, RolesGuard)
   @Patch('edit/:id')
   @UsePipes(new ValidationPipe())
   @UseInterceptors(
@@ -100,13 +101,13 @@ export class UsersController {
   }
 
   @Roles(Role.Admin)
-  @UseGuards(RolesGuard, TokenAuthGuard)
+  @UseGuards(TokenAuthGuard, RolesGuard)
   @Delete('delete/:id')
   deleteOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
     return this.userService.deleteOne(id);
   }
 
-  @UseGuards(RolesGuard, TokenAuthGuard)
+  @UseGuards(TokenAuthGuard)
   @Delete('sessions')
   logOut(@Req() req: Request) {
     return this.userService.logOut(req);
