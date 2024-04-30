@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import path from 'path';
+import * as path from 'path';
 import { randomUUID } from 'crypto';
 
 import { UsersService } from './users.service';
@@ -27,23 +27,23 @@ import { Role } from '../enums/role.enum';
 import { RolesGuard } from '../auth/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
-import { TokenAuthGuard } from '../token/token.guard';
+import { TokenAuthGuard } from '../auth/token.guard';
 
 @Controller('staff')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @Roles(Role.Admin)
-  @UseGuards(RolesGuard, TokenAuthGuard)
-  @Post('register-user')
+  @UseGuards(TokenAuthGuard, RolesGuard)
   @UsePipes(new ValidationPipe())
+  @Post('register-user')
   @UseInterceptors(
     FileInterceptor('photo', {
       storage: diskStorage({
-        destination: './public/uploads/staff',
+        destination: './public/uploads/',
         filename: (_req, file, cb) => {
           const extension = path.extname(file.originalname);
-          const filename = path.join('users', randomUUID() + extension);
+          const filename = path.join('staff', randomUUID() + extension);
           cb(null, filename);
         },
       }),
@@ -63,30 +63,30 @@ export class UsersController {
   }
 
   @Roles(Role.Admin)
-  @UseGuards(RolesGuard, TokenAuthGuard)
+  @UseGuards(TokenAuthGuard, RolesGuard)
   @Get()
   getAll() {
     return this.userService.getAll();
   }
 
   @Roles(Role.Admin)
-  @UseGuards(RolesGuard, TokenAuthGuard)
+  @UseGuards(TokenAuthGuard, RolesGuard)
   @Get('info/:id')
   getOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
     return this.userService.getOne(id);
   }
 
   @Roles(Role.Admin)
-  @UseGuards(RolesGuard, TokenAuthGuard)
+  @UseGuards(TokenAuthGuard, RolesGuard)
   @Patch('edit/:id')
   @UsePipes(new ValidationPipe())
   @UseInterceptors(
     FileInterceptor('photo', {
       storage: diskStorage({
-        destination: './public/uploads/staff',
+        destination: './public/uploads/',
         filename: (_req, file, cb) => {
           const extension = path.extname(file.originalname);
-          const filename = path.join('users', randomUUID() + extension);
+          const filename = path.join('staff', randomUUID() + extension);
           cb(null, filename);
         },
       }),
@@ -101,13 +101,13 @@ export class UsersController {
   }
 
   @Roles(Role.Admin)
-  @UseGuards(RolesGuard, TokenAuthGuard)
+  @UseGuards(TokenAuthGuard, RolesGuard)
   @Delete('delete/:id')
   deleteOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
     return this.userService.deleteOne(id);
   }
 
-  @UseGuards(RolesGuard, TokenAuthGuard)
+  @UseGuards(TokenAuthGuard)
   @Delete('sessions')
   logOut(@Req() req: Request) {
     return this.userService.logOut(req);

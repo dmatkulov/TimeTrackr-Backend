@@ -1,5 +1,4 @@
 import {
-  Body,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
@@ -16,7 +15,7 @@ export class PositionService {
     private positionModel: Model<PositionDocument>,
   ) {}
 
-  async createOne(@Body() dto: CreatePositionDto) {
+  async createOne(dto: CreatePositionDto) {
     try {
       const position = new this.positionModel({
         name: dto.name,
@@ -36,7 +35,7 @@ export class PositionService {
     return this.positionModel.find();
   }
 
-  async updateOne(id: Types.ObjectId, @Body() dto: CreatePositionDto) {
+  async updateOne(id: Types.ObjectId, dto: CreatePositionDto) {
     const position = await this.positionModel.findById(id);
 
     if (!position) {
