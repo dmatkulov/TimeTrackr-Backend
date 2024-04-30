@@ -92,7 +92,7 @@ export class UsersService {
   async updateOne(
     id: Types.ObjectId,
     file: Express.Multer.File,
-    createUserDto: CreateUserDto,
+    dto: CreateUserDto,
   ) {
     const user = await this.userModel.findById(id);
 
@@ -107,15 +107,15 @@ export class UsersService {
 
     try {
       const update = {
-        email: createUserDto.email,
-        password: createUserDto.password,
-        firstname: createUserDto.firstname,
-        lastname: createUserDto.lastname,
+        email: dto.email,
+        password: dto.password,
+        firstname: dto.firstname,
+        lastname: dto.lastname,
         photo: file ? file.filename : null,
-        contactInfo: createUserDto.contactInfo,
-        position: createUserDto.position,
-        roles: createUserDto.role,
-        startDate: createUserDto.startDate,
+        contactInfo: dto.contactInfo,
+        position: dto.position,
+        roles: dto.role,
+        startDate: dto.startDate,
       };
 
       const newUser = await this.userModel.findOneAndUpdate(
