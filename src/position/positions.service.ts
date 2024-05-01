@@ -9,7 +9,7 @@ import { Position, PositionDocument } from '../schemas/position.schema';
 import { CreatePositionDto } from '../dto/create-position.dto';
 
 @Injectable()
-export class PositionService {
+export class PositionsService {
   constructor(
     @InjectModel(Position.name)
     private positionModel: Model<PositionDocument>,

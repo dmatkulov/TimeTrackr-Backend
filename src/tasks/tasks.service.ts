@@ -42,24 +42,23 @@ export class TasksService {
     const isEmployee = user.roles.includes(Role.Employee);
 
     if (isAdmin) {
-      filter = {};
-    }
-    if (isAdmin && userId) {
-      filter = { userId };
-    }
-    if (isAdmin && date) {
-      filter = { executionDate: date };
-    }
-
-    if (userId && date) {
-      filter = { userId, executionDate: date };
+      if (userId) {
+        filter = { userId };
+      } else if (date) {
+        filter = { executionDate: date };
+      } else if (userId && date) {
+        filter = { userId, executionDate: date };
+      } else {
+        filter = {};
+      }
     }
 
     if (isEmployee) {
-      filter = { userId: user._id };
-    }
-    if (isEmployee && date) {
-      filter = { userId: user._id, executionDate: date };
+      if (date) {
+        filter = { userId: user._id, executionDate: date };
+      } else {
+        filter = { userId: user._id };
+      }
     }
 
     return this.taskModel.find(filter);
@@ -72,7 +71,7 @@ export class TasksService {
       throw new NotFoundException({ message: 'Объект не найден' });
     }
 
-    if (task.userId === user._id) {
+    if (user._id.equals(task.userId)) {
       try {
         const update = {
           executionDate: dto.executionDate,
@@ -100,13 +99,17 @@ export class TasksService {
   async deleteOne(id: Types.ObjectId, user: UserDocument) {
     const task = await this.taskModel.findById(id);
     const isAdmin = user.roles.includes(Role.Admin);
+    const isUser = user.roles.includes(Role.Employee);
+
     if (!task) {
       throw new NotFoundException({ message: 'Объект не найден' });
     }
 
     if (isAdmin) {
-      this.taskModel.findByIdAndDelete(id);
-    } else if (task.userId === user._id) {
+      return this.taskModel.findOneAndDelete(id);
+    }
+
+    if (isUser && user._id.equals(task.userId)) {
       this.taskModel.findOneAndDelete({ _id: id, userId: user._id });
     } else {
       throw new UnauthorizedException();

@@ -1,7 +1,7 @@
 export enum TaskLabel {
   Testing = 'Тестирование',
   Research = 'Исследование',
-  Sales = 'Продажи',
-  Administrative = 'Административное',
+  Design = 'UI/UX Design',
+  Management = 'Менеджмент',
   Development = 'Разработка',
 }
