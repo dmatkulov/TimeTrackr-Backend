@@ -95,8 +95,8 @@ export class UsersService {
     dto: CreateUserDto,
     user: UserDocument,
   ) {
-    const isAdmin = user.roles.includes(Role.Admin);
-    const isEmployee = user.roles.includes(Role.Employee);
+    const isAdmin = user.role === Role.Admin;
+    const isEmployee = user.role === Role.Employee;
 
     const existingUser = await this.userModel.findById(id);
 

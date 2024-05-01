@@ -38,8 +38,8 @@ export class TasksService {
 
   async getAll(user: UserDocument, userId: string, date: string) {
     let filter: FilterQuery<TaskDocument> = {};
-    const isAdmin = user.roles.includes(Role.Admin);
-    const isEmployee = user.roles.includes(Role.Employee);
+    const isAdmin = user.role === Role.Admin;
+    const isEmployee = user.role === Role.Admin;
 
     if (isAdmin) {
       if (userId) {
@@ -98,8 +98,8 @@ export class TasksService {
 
   async deleteOne(id: Types.ObjectId, user: UserDocument) {
     const task = await this.taskModel.findById(id);
-    const isAdmin = user.roles.includes(Role.Admin);
-    const isUser = user.roles.includes(Role.Employee);
+    const isAdmin = user.role === Role.Admin;
+    const isEmployee = user.role === Role.Admin;
 
     if (!task) {
       throw new NotFoundException({ message: 'Объект не найден' });
@@ -109,7 +109,7 @@ export class TasksService {
       return this.taskModel.findOneAndDelete(id);
     }
 
-    if (isUser && user._id.equals(task.userId)) {
+    if (isEmployee && user._id.equals(task.userId)) {
       this.taskModel.findOneAndDelete({ _id: id, userId: user._id });
     } else {
       throw new UnauthorizedException();
