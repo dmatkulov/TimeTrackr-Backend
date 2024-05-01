@@ -28,6 +28,8 @@ import { RolesGuard } from '../auth/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { TokenAuthGuard } from '../auth/token.guard';
+import { GetUser } from '../decorators/get-user.decorator';
+import { UserDocument } from '../schemas/user.schema';
 
 @Controller('staff')
 export class UsersController {
@@ -58,8 +60,8 @@ export class UsersController {
 
   @UseGuards(AuthGuard('local'))
   @Post('sessions')
-  login(@Req() req: Request) {
-    return this.userService.login(req);
+  login(@GetUser() user: UserDocument) {
+    return this.userService.login(user);
   }
 
   @Roles(Role.Admin)
@@ -76,7 +78,7 @@ export class UsersController {
     return this.userService.getOne(id);
   }
 
-  @Roles(Role.Admin)
+  @Roles(Role.Admin, Role.Employee)
   @UseGuards(TokenAuthGuard, RolesGuard)
   @Patch('edit/:id')
   @UsePipes(new ValidationPipe())
@@ -96,8 +98,9 @@ export class UsersController {
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
     @UploadedFile() file: Express.Multer.File,
     @Body() dto: CreateUserDto,
+    @GetUser() user: UserDocument,
   ) {
-    return this.userService.updateOne(id, file, dto);
+    return this.userService.updateOne(id, file, dto, user);
   }
 
   @Roles(Role.Admin)

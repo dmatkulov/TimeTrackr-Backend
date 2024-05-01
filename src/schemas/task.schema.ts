@@ -3,7 +3,7 @@ import { User } from './user.schema';
 import mongoose, { Document } from 'mongoose';
 import { GetTaskInfoDto } from '../dto/get-taskInfo.dto';
 
-@Schema()
+@Schema({ timestamps: true })
 export class Task {
   @Prop({ ref: User.name, required: true })
   userId: mongoose.Schema.Types.ObjectId;
