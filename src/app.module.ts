@@ -9,16 +9,18 @@ import { AuthService } from './auth/auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { RolesGuard } from './auth/roles.guard';
 import { LocalStrategy } from './auth/local.strategy';
-import { FixturesService } from './fixtures/fixtures.service';
-import { SeedService } from './fixtures/seed.service';
+import { PositionsSeedService } from './position/positions.seed.service';
 import { CommandModule } from 'nestjs-command';
 import { Position, PositionSchema } from './schemas/position.schema';
-import { PositionService } from './position/position.service';
-import { PositionController } from './position/position.controller';
+import { PositionsService } from './position/positions.service';
+import { PositionsController } from './position/positions.controller';
 import { Task, TaskSchema } from './schemas/task.schema';
 import { TasksService } from './tasks/tasks.service';
 import { TasksController } from './tasks/tasks.controller';
 import { TokenAuthGuard } from './auth/token.guard';
+import { UsersSeedService } from './users/users.seed.service';
+import { TasksSeedService } from './tasks/tasks.seed.service';
+import { SeedCommandService } from './seedCommand/seed.command.service';
 
 @Module({
   imports: [
@@ -34,7 +36,7 @@ import { TokenAuthGuard } from './auth/token.guard';
   controllers: [
     AppController,
     UsersController,
-    PositionController,
+    PositionsController,
     TasksController,
   ],
   providers: [
@@ -43,11 +45,15 @@ import { TokenAuthGuard } from './auth/token.guard';
     LocalStrategy,
     RolesGuard,
     TokenAuthGuard,
+
     UsersService,
-    FixturesService,
-    SeedService,
-    PositionService,
+    PositionsService,
     TasksService,
+
+    SeedCommandService,
+    PositionsSeedService,
+    UsersSeedService,
+    TasksSeedService,
   ],
 })
 export class AppModule {}

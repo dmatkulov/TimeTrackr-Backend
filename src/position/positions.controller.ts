@@ -10,7 +10,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { PositionService } from './position.service';
+import { PositionsService } from './positions.service';
 import { Roles } from '../decorators/roles.decorator';
 import { Role } from '../enums/role.enum';
 import { RolesGuard } from '../auth/roles.guard';
@@ -20,8 +20,8 @@ import { ParseObjectIdPipe } from 'nestjs-object-id';
 import { Types } from 'mongoose';
 
 @Controller('position')
-export class PositionController {
-  constructor(private readonly positionService: PositionService) {}
+export class PositionsController {
+  constructor(private readonly positionsService: PositionsService) {}
 
   @Roles(Role.Admin)
   @UseGuards(TokenAuthGuard, RolesGuard)
@@ -29,14 +29,14 @@ export class PositionController {
   @UsePipes(new ValidationPipe())
   @Post()
   createOne(@Body() dto: CreatePositionDto) {
-    return this.positionService.createOne(dto);
+    return this.positionsService.createOne(dto);
   }
 
   @Roles(Role.Admin)
   @UseGuards(TokenAuthGuard, RolesGuard)
   @Get()
   getAll() {
-    return this.positionService.getAll();
+    return this.positionsService.getAll();
   }
 
   @Roles(Role.Admin)
@@ -47,13 +47,13 @@ export class PositionController {
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
     @Body() dto: CreatePositionDto,
   ) {
-    return this.positionService.updateOne(id, dto);
+    return this.positionsService.updateOne(id, dto);
   }
 
   @Roles(Role.Admin)
   @UseGuards(TokenAuthGuard, RolesGuard)
   @Delete('delete/:id')
   deleteOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
-    return this.positionService.deleteOne(id);
+    return this.positionsService.deleteOne(id);
   }
 }
