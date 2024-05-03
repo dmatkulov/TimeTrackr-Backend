@@ -26,7 +26,8 @@ export class TasksService {
         tasks: dto.tasks,
       });
 
-      return await task.save();
+      await task.save();
+      return { message: 'Задача успешно добавлена в таблицу' };
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
         throw new UnprocessableEntityException(e);
@@ -38,18 +39,16 @@ export class TasksService {
 
   async getAll(user: UserDocument, userId: string, date: string) {
     let filter: FilterQuery<TaskDocument> = {};
-    const isAdmin = user.roles.includes(Role.Admin);
-    const isEmployee = user.roles.includes(Role.Employee);
+    const isAdmin = user.role === Role.Admin;
+    const isEmployee = user.role === Role.Employee;
 
     if (isAdmin) {
-      if (userId) {
+      if (userId && date) {
+        filter = { userId, executionDate: date };
+      } else if (userId) {
         filter = { userId };
       } else if (date) {
         filter = { executionDate: date };
-      } else if (userId && date) {
-        filter = { userId, executionDate: date };
-      } else {
-        filter = {};
       }
     }
 
@@ -84,7 +83,8 @@ export class TasksService {
           { new: true },
         );
 
-        return await task.save();
+        await task.save();
+        return { message: 'Задача обновлена' };
       } catch (e) {
         if (e instanceof mongoose.Error.ValidationError) {
           throw new UnprocessableEntityException(e);
@@ -98,19 +98,21 @@ export class TasksService {
 
   async deleteOne(id: Types.ObjectId, user: UserDocument) {
     const task = await this.taskModel.findById(id);
-    const isAdmin = user.roles.includes(Role.Admin);
-    const isUser = user.roles.includes(Role.Employee);
+    const isAdmin = user.role === Role.Admin;
+    const isEmployee = user.role === Role.Employee;
 
     if (!task) {
       throw new NotFoundException({ message: 'Объект не найден' });
     }
 
     if (isAdmin) {
-      return this.taskModel.findOneAndDelete(id);
+      await this.taskModel.findOneAndDelete(id);
+      return { message: 'Столбец удален из таблицы задач' };
     }
 
-    if (isUser && user._id.equals(task.userId)) {
-      this.taskModel.findOneAndDelete({ _id: id, userId: user._id });
+    if (isEmployee && user._id.equals(task.userId)) {
+      await this.taskModel.findOneAndDelete({ _id: id, userId: user._id });
+      return { message: 'Столбец удален из таблицы задач' };
     } else {
       throw new UnauthorizedException();
     }

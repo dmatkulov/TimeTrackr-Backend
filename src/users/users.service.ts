@@ -1,16 +1,16 @@
 import {
   Injectable,
   NotFoundException,
+  UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import path from 'path';
-import fs from 'fs';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { User, UserDocument } from '../schemas/user.schema';
 import mongoose, { Model, Types } from 'mongoose';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { Request } from 'express';
+import { Role } from '../enums/role.enum';
 
 @Injectable()
 export class UsersService {
@@ -45,8 +45,8 @@ export class UsersService {
     }
   }
 
-  async login(req: Request) {
-    return req.user;
+  async login(user: UserDocument) {
+    return { message: 'Выполнен вход', user };
   }
 
   async logOut(req: Request) {
@@ -93,19 +93,19 @@ export class UsersService {
     id: Types.ObjectId,
     file: Express.Multer.File,
     dto: CreateUserDto,
+    user: UserDocument,
   ) {
-    const user = await this.userModel.findById(id);
+    const isAdmin = user.role === Role.Admin;
+    const isEmployee = user.role === Role.Employee;
 
-    if (!user) {
+    const existingUser = await this.userModel.findById(id);
+
+    if (!existingUser) {
       throw new NotFoundException({ message: 'Пользователь не найден!' });
     }
 
-    if (user.photo) {
-      const filePath = path.join('./public/uploads/staff', user.photo);
-      fs.unlinkSync(filePath);
-    }
-
     try {
+      let updatedUser: UserDocument;
       const update = {
         email: dto.email,
         password: dto.password,
@@ -118,15 +118,27 @@ export class UsersService {
         startDate: dto.startDate,
       };
 
-      const newUser = await this.userModel.findOneAndUpdate(
-        id,
-        { $set: update },
-        { new: true },
-      );
+      if (isEmployee && existingUser._id.equals(user._id)) {
+        updatedUser = await this.userModel.findOneAndUpdate(
+          { _id: user._id },
+          { $set: update },
+          { new: true },
+        );
+      } else if (isAdmin) {
+        updatedUser = await this.userModel.findOneAndUpdate(
+          id,
+          { $set: update },
+          { new: true },
+        );
+      } else {
+        return new UnauthorizedException({
+          message: 'Вы не можете вносить изменения',
+        });
+      }
 
-      newUser.generateToken();
+      updatedUser.generateToken();
 
-      return await newUser.save();
+      return await updatedUser.save();
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
         throw new UnprocessableEntityException(e);
@@ -143,6 +155,7 @@ export class UsersService {
       throw new NotFoundException({ message: 'Пользователь не найден!' });
     }
 
-    return this.userModel.findOneAndDelete(id);
+    await this.userModel.findOneAndDelete(id);
+    return { message: 'Пользователь был удален!' };
   }
 }
