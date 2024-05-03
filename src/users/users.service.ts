@@ -46,7 +46,7 @@ export class UsersService {
   }
 
   async login(user: UserDocument) {
-    return { message: 'Выполнен вход', user };
+    return { message: `С возвращением, ${user.firstname}!`, user };
   }
 
   async logOut(req: Request) {
