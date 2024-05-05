@@ -22,7 +22,7 @@ export class UsersSeedService {
     await this.userModel.create(
       {
         email: 'admin@gmail.com',
-        password: '123',
+        password: 'qwerty12',
         firstname: 'Дильшад',
         lastname: 'Mаткулов',
         contactInfo: {
@@ -38,7 +38,7 @@ export class UsersSeedService {
       },
       {
         email: 'manager@gmail.com',
-        password: '123',
+        password: 'qwerty12',
         firstname: 'Назгул',
         lastname: 'Доолоткелдиева',
         contactInfo: {
@@ -54,7 +54,7 @@ export class UsersSeedService {
       },
       {
         email: 'frontend@gmail.com',
-        password: '123',
+        password: 'qwerty12',
         firstname: 'Максим',
         lastname: 'Иванов',
         contactInfo: {
@@ -70,7 +70,7 @@ export class UsersSeedService {
       },
       {
         email: 'designer@gmail.com',
-        password: '123',
+        password: 'qwerty12',
         firstname: 'Айжамал',
         lastname: 'Борисова',
         contactInfo: {
@@ -86,7 +86,7 @@ export class UsersSeedService {
       },
       {
         email: 'backend@gmail.com',
-        password: '123',
+        password: 'qwerty12',
         firstname: 'Бектур',
         lastname: 'Исмаилов',
         contactInfo: {
