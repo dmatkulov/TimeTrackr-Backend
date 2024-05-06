@@ -27,6 +27,6 @@ export class AuthService {
       }
     }
 
-    throw new UnauthorizedException('Данные не верны');
+    throw new UnauthorizedException('Введите корректные данные!');
   }
 }
