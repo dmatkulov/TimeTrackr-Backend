@@ -1,17 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { PositionsSeedService } from '../position/positions.seed.service';
 import { Command } from 'nestjs-command';
 import mongoose from 'mongoose';
-import { UsersSeedService } from '../users/users.seed.service';
-import { TasksSeedService } from '../tasks/tasks.seed.service';
+import { FixturesService } from './fixtures.service';
 
 @Injectable()
 export class SeedCommandService {
-  constructor(
-    private positionsSeedService: PositionsSeedService,
-    private userSeedService: UsersSeedService,
-    private tasksSeedService: TasksSeedService,
-  ) {}
+  constructor(private fixturesService: FixturesService) {}
 
   @Command({
     command: 'seed',
@@ -29,9 +23,7 @@ export class SeedCommandService {
       await this.dropCollection(db, collectionsName);
     }
 
-    await this.positionsSeedService.seedPositions();
-    await this.userSeedService.seedUsers();
-    await this.tasksSeedService.seedTasks();
+    await this.fixturesService.seedUsers();
 
     await this.closeConnection(db);
   }

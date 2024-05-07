@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UploadedFile,
   UseGuards,
@@ -67,8 +68,8 @@ export class UsersController {
   @Roles(Role.Admin)
   @UseGuards(TokenAuthGuard, RolesGuard)
   @Get()
-  getAll() {
-    return this.userService.getAll();
+  getAll(@Query('position') position: string) {
+    return this.userService.getAll(position);
   }
 
   @Roles(Role.Admin)

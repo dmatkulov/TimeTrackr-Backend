@@ -7,7 +7,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 
 import { User, UserDocument } from '../schemas/user.schema';
-import mongoose, { Model, Types } from 'mongoose';
+import mongoose, { FilterQuery, Model, Types } from 'mongoose';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { Request } from 'express';
 import { Role } from '../enums/role.enum';
@@ -75,8 +75,15 @@ export class UsersService {
     return successMessage;
   }
 
-  async getAll() {
-    return this.userModel.find();
+  async getAll(position: string) {
+    let filter: FilterQuery<UserDocument>;
+
+    if (position) {
+      filter = { position: position };
+    } else {
+      filter = {};
+    }
+    return this.userModel.find(filter);
   }
 
   async getOne(id: Types.ObjectId) {

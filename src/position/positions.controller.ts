@@ -19,7 +19,7 @@ import { CreatePositionDto } from '../dto/create-position.dto';
 import { ParseObjectIdPipe } from 'nestjs-object-id';
 import { Types } from 'mongoose';
 
-@Controller('position')
+@Controller('positions')
 export class PositionsController {
   constructor(private readonly positionsService: PositionsService) {}
 
