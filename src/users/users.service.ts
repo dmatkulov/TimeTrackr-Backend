@@ -75,11 +75,16 @@ export class UsersService {
     return successMessage;
   }
 
-  async getAll(position: string) {
+  async getAll(positions: string) {
     let filter: FilterQuery<UserDocument>;
 
-    if (position) {
-      filter = { position: position };
+    if (positions && positions.length > 0) {
+      const positionsQuery = positions.split(',');
+      const positionID = positionsQuery.map(
+        (position) => new Types.ObjectId(position),
+      );
+      console.log(positionID);
+      filter = { position: { $in: positionID } };
     } else {
       filter = {};
     }

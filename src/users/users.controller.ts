@@ -68,8 +68,8 @@ export class UsersController {
   @Roles(Role.Admin)
   @UseGuards(TokenAuthGuard, RolesGuard)
   @Get()
-  getAll(@Query('position') position: string) {
-    return this.userService.getAll(position);
+  getAll(@Query('positions') positions: string) {
+    return this.userService.getAll(positions);
   }
 
   @Roles(Role.Admin)

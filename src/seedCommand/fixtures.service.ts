@@ -102,6 +102,22 @@ export class FixturesService {
         startDate: '2020-01-27T12:00:00.000+00:00',
       },
       {
+        email: 'ux-designer@gmail.com',
+        password: 'qwerty12',
+        firstname: 'John',
+        lastname: 'Doe',
+        contactInfo: {
+          mobile: '+996220965227',
+          city: 'Бишкек',
+          street: 'ул. Конгантиева',
+        },
+        photo: 'fixtures/avatars/dave.jpg',
+        position: positions[3]._id,
+        role: Role.Employee,
+        token: randomUUID(),
+        startDate: '2020-01-27T12:00:00.000+00:00',
+      },
+      {
         email: 'backend@gmail.com',
         password: 'qwerty12',
         firstname: 'Бектур',
