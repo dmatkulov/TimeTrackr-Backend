@@ -85,26 +85,37 @@ export class UsersService {
       );
       filter = { position: { $in: positionID } };
 
-      if (email && lastname) {
-        filter = { position: { $in: positionID }, email, lastname };
-      }
-      if (email) {
-        filter = { position: { $in: positionID }, email };
+      if (lastname && email) {
+        filter = {
+          $or: [
+            { position: { $in: positionID } },
+            { lastname: lastname },
+            { email: email },
+          ],
+        };
       }
       if (lastname) {
         filter = { position: { $in: positionID }, lastname };
       }
+      if (email) {
+        filter = { position: { $in: positionID }, email };
+      }
     } else if (email && lastname) {
       filter = { email, lastname };
-    } else if (email) {
-      filter = { email };
     } else if (lastname) {
       filter = { lastname };
+    } else if (email) {
+      filter = { email };
     } else {
       filter = {};
     }
 
-    return this.userModel.find(filter);
+    const users: UserDocument[] = await this.userModel.find(filter);
+    if (users.length === 0) {
+      return { message: 'По таким по параметрам никто не найден' };
+    } else {
+      return users;
+    }
   }
 
   async getOne(id: Types.ObjectId) {
