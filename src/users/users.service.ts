@@ -75,7 +75,7 @@ export class UsersService {
     return successMessage;
   }
 
-  async getAll(positions: string) {
+  async getAll(positions: string, email: string, lastname: string) {
     let filter: FilterQuery<UserDocument>;
 
     if (positions && positions.length > 0) {
@@ -83,11 +83,27 @@ export class UsersService {
       const positionID = positionsQuery.map(
         (position) => new Types.ObjectId(position),
       );
-      console.log(positionID);
       filter = { position: { $in: positionID } };
+
+      if (email && lastname) {
+        filter = { position: { $in: positionID }, email, lastname };
+      }
+      if (email) {
+        filter = { position: { $in: positionID }, email };
+      }
+      if (lastname) {
+        filter = { position: { $in: positionID }, lastname };
+      }
+    } else if (email && lastname) {
+      filter = { email, lastname };
+    } else if (email) {
+      filter = { email };
+    } else if (lastname) {
+      filter = { lastname };
     } else {
       filter = {};
     }
+
     return this.userModel.find(filter);
   }
 
