@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsPhoneNumber, IsString } from 'class-validator';
 
 export class GetContactInfoDto {
-  @IsPhoneNumber('KG')
+  @IsPhoneNumber('KG', { message: 'Неверный формат номера телефона' })
   @IsNotEmpty()
   mobile: string;
 

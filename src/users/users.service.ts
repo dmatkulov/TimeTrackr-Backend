@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -7,7 +8,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 
 import { User, UserDocument } from '../schemas/user.schema';
-import mongoose, { FilterQuery, Model, Types } from 'mongoose';
+import mongoose, { FilterQuery, Model, mongo, Types } from 'mongoose';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { Request } from 'express';
 import { Role } from '../enums/role.enum';
@@ -35,10 +36,15 @@ export class UsersService {
 
       user.generateToken();
 
-      return await user.save();
+      await user.save();
+      return { message: 'Сотрудник успешно добавлен', user };
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
         throw new UnprocessableEntityException(e);
+      }
+
+      if (e instanceof mongo.MongoServerError && e.code === 11000) {
+        throw new BadRequestException('Такая почта уже была зарегистрирована');
       }
 
       throw e;

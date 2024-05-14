@@ -13,7 +13,7 @@ import { Role } from '../enums/role.enum';
 import mongoose from 'mongoose';
 
 export class CreateUserDto {
-  @IsEmail()
+  @IsEmail({}, { message: 'Неверный формат почты' })
   @IsNotEmpty()
   email: string;
 
