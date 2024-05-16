@@ -116,12 +116,16 @@ export class UsersService {
       filter = {};
     }
 
-    const users: UserDocument[] = await this.userModel.find(filter);
+    const users: UserDocument[] = await this.userModel
+      .find(filter)
+      .populate('position');
     if (users.length === 0) {
-      return { message: 'По таким по параметрам никто не найден' };
-    } else {
-      return users;
+      throw new NotFoundException({
+        message: 'По таким по параметрам никто не найден',
+      });
     }
+
+    return users;
   }
 
   async getOne(id: Types.ObjectId) {
@@ -146,7 +150,7 @@ export class UsersService {
     const existingUser = await this.userModel.findById(id);
 
     if (!existingUser) {
-      throw new NotFoundException({ message: 'Пользователь не найден!' });
+      throw new NotFoundException('Пользователь не найден!');
     }
 
     try {
@@ -197,7 +201,7 @@ export class UsersService {
     const user = await this.userModel.findById(id);
 
     if (!user) {
-      throw new NotFoundException({ message: 'Пользователь не найден!' });
+      throw new NotFoundException('Пользователь не найден!');
     }
 
     await this.userModel.findOneAndDelete(id);

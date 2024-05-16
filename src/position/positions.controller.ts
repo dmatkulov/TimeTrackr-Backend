@@ -41,6 +41,13 @@ export class PositionsController {
 
   @Roles(Role.Admin)
   @UseGuards(TokenAuthGuard, RolesGuard)
+  @Get('info/:id')
+  getOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
+    return this.positionsService.getOne(id);
+  }
+
+  @Roles(Role.Admin)
+  @UseGuards(TokenAuthGuard, RolesGuard)
   @Patch('edit/:id')
   @UsePipes(new ValidationPipe())
   updateOne(

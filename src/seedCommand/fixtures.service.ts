@@ -43,7 +43,7 @@ export class FixturesService {
         firstname: 'Дильшад',
         lastname: 'Mаткулов',
         contactInfo: {
-          mobile: '+996220965222',
+          mobile: '996220965222',
           city: 'Джалалабад',
           street: 'ул. Гагарина',
         },
@@ -59,7 +59,7 @@ export class FixturesService {
         firstname: 'Назгул',
         lastname: 'Доолоткелдиева',
         contactInfo: {
-          mobile: '+996220965223',
+          mobile: '996220965223',
           city: 'Бишкек',
           street: 'ул. Турусбекова',
         },
@@ -75,7 +75,7 @@ export class FixturesService {
         firstname: 'Максим',
         lastname: 'Иванов',
         contactInfo: {
-          mobile: '+996220965225',
+          mobile: '996220965225',
           city: 'Москва',
           street: 'ул. Пушкина',
         },
@@ -91,7 +91,7 @@ export class FixturesService {
         firstname: 'Айжамал',
         lastname: 'Борисова',
         contactInfo: {
-          mobile: '+996220965226',
+          mobile: '996220965226',
           city: 'Бишкек',
           street: 'ул. Конгантиева',
         },
@@ -107,7 +107,7 @@ export class FixturesService {
         firstname: 'John',
         lastname: 'Doe',
         contactInfo: {
-          mobile: '+996220965227',
+          mobile: '996220965227',
           city: 'Бишкек',
           street: 'ул. Конгантиева',
         },
@@ -123,7 +123,7 @@ export class FixturesService {
         firstname: 'Бектур',
         lastname: 'Исмаилов',
         contactInfo: {
-          mobile: '+996220965227',
+          mobile: '996220965227',
           city: 'Бишкек',
           street: 'ул. Медерова',
         },

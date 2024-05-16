@@ -67,7 +67,7 @@ export class TasksService {
     const task = await this.taskModel.findById(id);
 
     if (!task) {
-      throw new NotFoundException({ message: 'Объект не найден' });
+      throw new NotFoundException('Объект не найден');
     }
 
     if (user._id.equals(task.userId)) {
@@ -102,7 +102,7 @@ export class TasksService {
     const isEmployee = user.role === Role.Employee;
 
     if (!task) {
-      throw new NotFoundException({ message: 'Объект не найден' });
+      throw new NotFoundException('Объект не найден');
     }
 
     if (isAdmin) {

@@ -1,10 +1,11 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model, Types } from 'mongoose';
+import mongoose, { Model, mongo, Types } from 'mongoose';
 import { Position, PositionDocument } from '../schemas/position.schema';
 import { CreatePositionDto } from '../dto/create-position.dto';
 
@@ -21,10 +22,15 @@ export class PositionsService {
         name: dto.name,
       });
 
-      return await position.save();
+      await position.save();
+      return { message: 'Новая позиция успешно добавлена' };
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
         throw new UnprocessableEntityException(e);
+      }
+
+      if (e instanceof mongo.MongoServerError && e.code === 11000) {
+        throw new BadRequestException('Такая позиция уже имеется в базе');
       }
 
       throw e;
@@ -32,14 +38,24 @@ export class PositionsService {
   }
 
   async getAll() {
-    return this.positionModel.find();
+    return this.positionModel.find().sort({ _id: -1 });
+  }
+
+  async getOne(id: Types.ObjectId) {
+    const position = await this.positionModel.findById(id);
+
+    if (!position) {
+      throw new NotFoundException('Позиция не найдена!');
+    }
+
+    return position;
   }
 
   async updateOne(id: Types.ObjectId, dto: CreatePositionDto) {
     const position = await this.positionModel.findById(id);
 
     if (!position) {
-      throw new NotFoundException({ message: 'Должность не найдена"' });
+      throw new NotFoundException('Должность не найдена');
     }
 
     try {
@@ -48,9 +64,15 @@ export class PositionsService {
         { $set: { name: dto.name } },
         { new: true },
       );
+
+      return { message: 'Данные успешно обновлены' };
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
         throw new UnprocessableEntityException(e);
+      }
+
+      if (e instanceof mongo.MongoServerError && e.code === 11000) {
+        throw new BadRequestException('Такая позиция уже имеется в базе');
       }
 
       throw e;
@@ -61,7 +83,7 @@ export class PositionsService {
     const position = await this.positionModel.findById(id);
 
     if (!position) {
-      throw new NotFoundException({ message: 'Должность не найдена"' });
+      throw new NotFoundException('Должность не найдена');
     }
 
     return this.positionModel.findByIdAndDelete(id);
