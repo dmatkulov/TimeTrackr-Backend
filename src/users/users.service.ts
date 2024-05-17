@@ -92,13 +92,7 @@ export class UsersService {
       filter = { position: { $in: positionID } };
 
       if (lastname && email) {
-        filter = {
-          $or: [
-            { position: { $in: positionID } },
-            { lastname: lastname },
-            { email: email },
-          ],
-        };
+        filter = { position: { $in: positionID }, lastname, email };
       }
       if (lastname) {
         filter = { position: { $in: positionID }, lastname };
