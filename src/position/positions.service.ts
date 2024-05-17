@@ -20,6 +20,7 @@ export class PositionsService {
     try {
       const position = new this.positionModel({
         name: dto.name,
+        tag: dto.tag,
       });
 
       await position.save();
@@ -61,7 +62,7 @@ export class PositionsService {
     try {
       await this.positionModel.findOneAndUpdate(
         id,
-        { $set: { name: dto.name } },
+        { $set: { name: dto.name, tag: dto.tag } },
         { new: true },
       );
 

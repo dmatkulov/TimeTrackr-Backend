@@ -25,15 +25,18 @@ export class FixturesService {
     const positions = await this.positionModel.create(
       {
         name: 'Администратор IT-систем',
+        tag: 'orange',
       },
       {
         name: 'Менеджер по проектам',
+        tag: 'green',
       },
       {
         name: 'Фронтенд-разработчик',
+        tag: 'volcano',
       },
-      { name: 'Дизайнер интерфейсов' },
-      { name: 'Бэкенд-разработчик' },
+      { name: 'Дизайнер интерфейсов', tag: 'cyan' },
+      { name: 'Бэкенд-разработчик', tag: 'purple' },
     );
 
     const users = await this.userModel.create(

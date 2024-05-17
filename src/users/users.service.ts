@@ -118,7 +118,8 @@ export class UsersService {
 
     const users: UserDocument[] = await this.userModel
       .find(filter)
-      .populate('position');
+      .populate('position')
+      .select('email firstname lastname position photo');
     if (users.length === 0) {
       throw new NotFoundException({
         message: 'По таким по параметрам никто не найден',
