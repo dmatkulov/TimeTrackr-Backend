@@ -84,9 +84,11 @@ export class PositionsService {
     const position = await this.positionModel.findById(id);
 
     if (!position) {
-      throw new NotFoundException('Должность не найдена');
+      throw new NotFoundException('Позиция не найдена');
     }
 
-    return this.positionModel.findByIdAndDelete(id);
+    await this.positionModel.findByIdAndDelete(id);
+
+    return { message: 'Позиция была успешно удалена' };
   }
 }
