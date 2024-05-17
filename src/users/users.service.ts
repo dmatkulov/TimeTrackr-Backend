@@ -145,7 +145,7 @@ export class UsersService {
     const existingUser = await this.userModel.findById(id);
 
     if (!existingUser) {
-      throw new NotFoundException('Пользователь не найден!');
+      throw new NotFoundException({ message: 'Пользователь не найден!' });
     }
 
     try {
@@ -176,7 +176,7 @@ export class UsersService {
         );
       } else {
         return new UnauthorizedException({
-          message: 'Вы не можете вносить изменения',
+          message: 'Вы не сможете вносить изменения',
         });
       }
 
@@ -196,7 +196,7 @@ export class UsersService {
     const user = await this.userModel.findById(id);
 
     if (!user) {
-      throw new NotFoundException('Пользователь не найден!');
+      throw new NotFoundException({ message: 'Пользователь не найден!' });
     }
 
     await this.userModel.findOneAndDelete(id);
