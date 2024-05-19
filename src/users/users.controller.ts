@@ -40,18 +40,7 @@ export class UsersController {
   @UseGuards(TokenAuthGuard, RolesGuard)
   @UsePipes(new ValidationPipe())
   @Post('register-user')
-  @UseInterceptors(
-    FileInterceptor('photo', {
-      storage: diskStorage({
-        destination: './public/uploads/',
-        filename: (_req, file, cb) => {
-          const extension = path.extname(file.originalname);
-          const filename = path.join('staff', randomUUID() + extension);
-          cb(null, filename);
-        },
-      }),
-    }),
-  )
+  @UseInterceptors(FileInterceptor('photo', { dest: './public/uploads/staff' }))
   createOne(
     @UploadedFile() file: Express.Multer.File,
     @Body() dto: CreateUserDto,

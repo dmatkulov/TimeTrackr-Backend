@@ -27,7 +27,7 @@ export class UsersService {
         password: createUserDto.password,
         firstname: createUserDto.firstname,
         lastname: createUserDto.lastname,
-        photo: file ? file.filename : null,
+        photo: file ? '/uploads/staff/' + file.filename : null,
         contactInfo: createUserDto.contactInfo,
         position: createUserDto.position,
         roles: createUserDto.role,
@@ -113,7 +113,8 @@ export class UsersService {
     const users: UserDocument[] = await this.userModel
       .find(filter)
       .populate('position')
-      .select('email firstname lastname position photo');
+      .select('email firstname lastname position photo')
+      .sort({ startDate: -1 });
     if (users.length === 0) {
       throw new NotFoundException({
         message: 'По таким по параметрам никто не найден',
