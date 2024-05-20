@@ -12,6 +12,7 @@ import mongoose, { FilterQuery, Model, mongo, Types } from 'mongoose';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { Request } from 'express';
 import { Role } from '../enums/role.enum';
+import { UpdateUserDto } from '../dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -137,7 +138,7 @@ export class UsersService {
   async updateOne(
     id: Types.ObjectId,
     file: Express.Multer.File,
-    dto: CreateUserDto,
+    dto: UpdateUserDto,
     currentUser: UserDocument,
   ) {
     const isAdmin = currentUser.role === Role.Admin;
@@ -163,7 +164,6 @@ export class UsersService {
 
       const update = {
         email: dto.email,
-        password: dto.password,
         firstname: dto.firstname,
         lastname: dto.lastname,
         photo: image,
@@ -174,17 +174,17 @@ export class UsersService {
       };
 
       if (isEmployee && existingUser._id.equals(currentUser._id)) {
-        user = await this.userModel.findOneAndUpdate(
-          { _id: currentUser._id },
-          { $set: update },
-          { new: true },
-        );
+        user = await this.userModel
+          .findOneAndUpdate(
+            { _id: currentUser._id },
+            { $set: update },
+            { new: true },
+          )
+          .populate('position');
       } else if (isAdmin) {
-        user = await this.userModel.findOneAndUpdate(
-          id,
-          { $set: update },
-          { new: true },
-        );
+        user = await this.userModel
+          .findOneAndUpdate(id, { $set: update }, { new: true })
+          .populate('position');
       } else {
         return new UnauthorizedException({
           message: 'Вы не сможете вносить изменения',
@@ -195,7 +195,7 @@ export class UsersService {
 
       await user.save();
 
-      return { message: 'Данные успешно обновлены', updatedUser: user };
+      return { message: 'Данные успешно обновлены', user };
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
         throw new UnprocessableEntityException(e);

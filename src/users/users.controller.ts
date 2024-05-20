@@ -31,6 +31,7 @@ import { UserDocument } from '../schemas/user.schema';
 import { randomUUID } from 'crypto';
 import * as path from 'path';
 import { diskStorage } from 'multer';
+import { UpdateUserDto } from '../dto/update-user.dto';
 
 @Controller('staff')
 export class UsersController {
@@ -102,7 +103,7 @@ export class UsersController {
   updateOne(
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
     @UploadedFile() file: Express.Multer.File,
-    @Body() dto: CreateUserDto,
+    @Body() dto: UpdateUserDto,
     @GetUser() user: UserDocument,
   ) {
     return this.userService.updateOne(id, file, dto, user);
