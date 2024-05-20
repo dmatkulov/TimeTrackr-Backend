@@ -27,7 +27,7 @@ export class UsersService {
         password: createUserDto.password,
         firstname: createUserDto.firstname,
         lastname: createUserDto.lastname,
-        photo: file ? '/uploads/staff/' + file.filename : null,
+        photo: file ? '/uploads/' + file.filename : null,
         contactInfo: createUserDto.contactInfo,
         position: createUserDto.position,
         roles: createUserDto.role,
@@ -125,10 +125,10 @@ export class UsersService {
   }
 
   async getOne(id: Types.ObjectId) {
-    const user = await this.userModel.findById(id);
+    const user = await this.userModel.findById(id).populate('position');
 
     if (!user) {
-      throw new NotFoundException({ message: 'Пользователь не найден!' });
+      throw new NotFoundException({ message: 'Сотрудник не найден!' });
     }
 
     return user;
@@ -138,39 +138,49 @@ export class UsersService {
     id: Types.ObjectId,
     file: Express.Multer.File,
     dto: CreateUserDto,
-    user: UserDocument,
+    currentUser: UserDocument,
   ) {
-    const isAdmin = user.role === Role.Admin;
-    const isEmployee = user.role === Role.Employee;
+    const isAdmin = currentUser.role === Role.Admin;
+    const isEmployee = currentUser.role === Role.Employee;
 
     const existingUser = await this.userModel.findById(id);
 
     if (!existingUser) {
-      throw new NotFoundException({ message: 'Пользователь не найден!' });
+      throw new NotFoundException({ message: 'Сотрудник не найден!' });
     }
 
     try {
-      let updatedUser: UserDocument;
+      let user: UserDocument;
+      let image: string | undefined | null;
+
+      if (dto.photo === 'delete') {
+        image = null;
+      } else if (file) {
+        image = '/uploads/' + file.filename;
+      } else {
+        image = dto.photo;
+      }
+
       const update = {
         email: dto.email,
         password: dto.password,
         firstname: dto.firstname,
         lastname: dto.lastname,
-        photo: file ? file.filename : null,
+        photo: image,
         contactInfo: dto.contactInfo,
         position: dto.position,
         roles: dto.role,
         startDate: dto.startDate,
       };
 
-      if (isEmployee && existingUser._id.equals(user._id)) {
-        updatedUser = await this.userModel.findOneAndUpdate(
-          { _id: user._id },
+      if (isEmployee && existingUser._id.equals(currentUser._id)) {
+        user = await this.userModel.findOneAndUpdate(
+          { _id: currentUser._id },
           { $set: update },
           { new: true },
         );
       } else if (isAdmin) {
-        updatedUser = await this.userModel.findOneAndUpdate(
+        user = await this.userModel.findOneAndUpdate(
           id,
           { $set: update },
           { new: true },
@@ -181,9 +191,11 @@ export class UsersService {
         });
       }
 
-      updatedUser.generateToken();
+      user.generateToken();
 
-      return await updatedUser.save();
+      await user.save();
+
+      return { message: 'Данные успешно обновлены', updatedUser: user };
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
         throw new UnprocessableEntityException(e);
@@ -197,10 +209,10 @@ export class UsersService {
     const user = await this.userModel.findById(id);
 
     if (!user) {
-      throw new NotFoundException({ message: 'Пользователь не найден!' });
+      throw new NotFoundException({ message: 'Сотрудник не найден!' });
     }
 
     await this.userModel.findOneAndDelete(id);
-    return { message: 'Пользователь был удален!' };
+    return { message: 'Сотрудник был удален!' };
   }
 }

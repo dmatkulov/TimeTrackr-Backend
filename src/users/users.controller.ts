@@ -15,9 +15,6 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import * as path from 'path';
-import { randomUUID } from 'crypto';
 
 import { UsersService } from './users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -31,6 +28,9 @@ import { Request } from 'express';
 import { TokenAuthGuard } from '../auth/token.guard';
 import { GetUser } from '../decorators/get-user.decorator';
 import { UserDocument } from '../schemas/user.schema';
+import { randomUUID } from 'crypto';
+import * as path from 'path';
+import { diskStorage } from 'multer';
 
 @Controller('staff')
 export class UsersController {
@@ -40,7 +40,18 @@ export class UsersController {
   @UseGuards(TokenAuthGuard, RolesGuard)
   @UsePipes(new ValidationPipe())
   @Post('register-user')
-  @UseInterceptors(FileInterceptor('photo', { dest: './public/uploads/staff' }))
+  @UseInterceptors(
+    FileInterceptor('photo', {
+      storage: diskStorage({
+        destination: './public/uploads/',
+        filename: (_req, file, cb) => {
+          const extension = path.extname(file.originalname);
+          const filename = path.join('staff', randomUUID() + extension);
+          cb(null, filename);
+        },
+      }),
+    }),
+  )
   createOne(
     @UploadedFile() file: Express.Multer.File,
     @Body() dto: CreateUserDto,
