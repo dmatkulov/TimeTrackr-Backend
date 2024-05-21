@@ -52,7 +52,10 @@ export class UsersService {
     }
   }
 
-  async login(user: UserDocument) {
+  async login(activeUser: UserDocument) {
+    const user = await this.userModel
+      .findById(activeUser._id)
+      .populate('position');
     return { message: `С возвращением, ${user.firstname}!`, user };
   }
 

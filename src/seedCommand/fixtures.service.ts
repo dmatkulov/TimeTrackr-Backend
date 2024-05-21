@@ -64,7 +64,7 @@ export class FixturesService {
         contactInfo: {
           mobile: '996220965223',
           city: 'Бишкек',
-          street: 'ул. Турусбекова',
+          street: 'Турусбекова',
         },
         photo: 'fixtures/avatars/nazgul.jpg',
         position: positions[1]._id,
@@ -80,7 +80,7 @@ export class FixturesService {
         contactInfo: {
           mobile: '996220965225',
           city: 'Москва',
-          street: 'ул. Пушкина',
+          street: 'Пушкина',
         },
         photo: 'fixtures/avatars/maxim.jpg',
         position: positions[2]._id,
@@ -96,7 +96,7 @@ export class FixturesService {
         contactInfo: {
           mobile: '996220965226',
           city: 'Бишкек',
-          street: 'ул. Конгантиева',
+          street: 'Конгантиева',
         },
         photo: 'fixtures/avatars/jamal.jpg',
         position: positions[3]._id,
@@ -112,7 +112,7 @@ export class FixturesService {
         contactInfo: {
           mobile: '996220965227',
           city: 'Бишкек',
-          street: 'ул. Конгантиева',
+          street: 'Конгантиева',
         },
         photo: 'fixtures/avatars/john.jpg',
         position: positions[3]._id,
@@ -128,7 +128,7 @@ export class FixturesService {
         contactInfo: {
           mobile: '996220965227',
           city: 'Бишкек',
-          street: 'ул. Медерова',
+          street: 'Медерова',
         },
         photo: 'fixtures/avatars/bektur.jpg',
         position: positions[4]._id,

@@ -32,7 +32,6 @@ export class PositionsController {
     return this.positionsService.createOne(dto);
   }
 
-  @Roles(Role.Admin)
   @UseGuards(TokenAuthGuard, RolesGuard)
   @Get()
   getAll() {
