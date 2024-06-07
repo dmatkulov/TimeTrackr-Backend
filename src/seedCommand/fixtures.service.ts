@@ -146,6 +146,7 @@ export class FixturesService {
           {
             startTime: '09:00',
             endTime: '11:00',
+            timeSpent: '2 hours',
             title: 'Созвон с клиентом',
             description: 'Обсуждение правко по сделанной работе',
             label: TaskLabel.Management,
@@ -153,6 +154,7 @@ export class FixturesService {
           {
             startTime: '11:30',
             endTime: '13:30',
+            timeSpent: '2 hours',
             title: 'Подготовка отчета',
             description:
               'Сбор и анализ данных для подготовки еженедельного отчета',
@@ -161,6 +163,7 @@ export class FixturesService {
           {
             startTime: '14:00',
             endTime: '16:00',
+            timeSpent: '2 hours',
             title: 'Тестирование нового функционала',
             description:
               'Проведение тестов для проверки работоспособности новых функций',
@@ -169,6 +172,7 @@ export class FixturesService {
           {
             startTime: '16:30',
             endTime: '18:00',
+            timeSpent: '2 hours',
             title: 'Обучение новых сотрудников',
             description:
               'Проведение обучающего семинара для новых сотрудников отдела',
@@ -183,9 +187,10 @@ export class FixturesService {
           {
             startTime: '09:00',
             endTime: '18:00',
+            timeSpent: '2 hours',
             title: 'Разработка нового функционала',
             description: 'Программирование и тестирование новых функций.',
-            label: TaskLabel.Development,
+            label: TaskLabel.NewTask,
           },
         ],
       },
@@ -196,9 +201,10 @@ export class FixturesService {
           {
             startTime: '11:30',
             endTime: '18:30',
+            timeSpent: '2 hours',
             title: 'Отладка и исправление ошибок',
             description: 'Поиск и устранение ошибок в существующем коде.',
-            label: TaskLabel.Development,
+            label: TaskLabel.NewTask,
           },
         ],
       },
@@ -209,17 +215,19 @@ export class FixturesService {
           {
             startTime: '09:00',
             endTime: '15:00',
+            timeSpent: '2 hours',
             title: 'Создание макетов интерфейса',
             description: 'Разработка дизайна для новых экранов приложения.',
-            label: TaskLabel.Design,
+            label: TaskLabel.NewTask,
           },
           {
             startTime: '16:00',
             endTime: '18:00',
+            timeSpent: '2 hours',
             title: 'Обратная связь и корректировки',
             description:
               'Обсуждение и внесение изменений в дизайн по обратной связи.',
-            label: TaskLabel.Research,
+            label: TaskLabel.Bug,
           },
         ],
       },
@@ -230,17 +238,19 @@ export class FixturesService {
           {
             startTime: '10:00',
             endTime: '14:00',
+            timeSpent: '2 hours',
             title: 'Анализ и оптимизация производительности базы данных.',
             description: 'Test description2',
-            label: TaskLabel.Development,
+            label: TaskLabel.NewTask,
           },
           {
             startTime: '14:00',
             endTime: '19:00',
+            timeSpent: '2 hours',
             title: 'Разработка нового API-метода',
             description:
               'Написание кода для нового API-метода и его тестирование.',
-            label: TaskLabel.Testing,
+            label: TaskLabel.NewTask,
           },
         ],
       },
@@ -251,10 +261,11 @@ export class FixturesService {
           {
             startTime: '09:00',
             endTime: '17:00',
+            timeSpent: '2 hours',
             title: 'Интеграция с внешними сервисами',
             description:
               'Разработка кода для интеграции с внешними сервисами и API.',
-            label: TaskLabel.Development,
+            label: TaskLabel.NewTask,
           },
         ],
       },

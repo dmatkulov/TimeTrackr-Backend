@@ -44,7 +44,7 @@ export class TasksService {
 
     if (isAdmin) {
       if (userId && date) {
-        filter = { userId, executionDate: date };
+        filter = { userId, executionDate: new Date(date) };
       } else if (userId) {
         filter = { userId };
       } else if (date) {
@@ -54,13 +54,14 @@ export class TasksService {
 
     if (isEmployee) {
       if (date) {
-        filter = { userId: user._id, executionDate: date };
+        filter = { userId: user._id, executionDate: new Date(date) };
       } else {
         filter = { userId: user._id };
       }
     }
-
-    return this.taskModel.find(filter);
+    console.log('Filter:', filter);
+    console.log('isEmployee:', isEmployee);
+    return this.taskModel.findOne(filter);
   }
 
   async updateOne(id: Types.ObjectId, user: UserDocument, dto: CreateTaskDto) {

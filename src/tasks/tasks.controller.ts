@@ -41,6 +41,7 @@ export class TasksController {
     @Query('userId') userId: string,
     @Query('date') date: string,
   ) {
+    console.log(date);
     return this.tasksService.getAll(user, userId, date);
   }
 
