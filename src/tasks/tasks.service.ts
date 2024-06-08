@@ -20,14 +20,27 @@ export class TasksService {
 
   async createOne(user: UserDocument, dto: CreateTaskDto) {
     try {
-      const task = new this.taskModel({
-        userId: user._id,
+      const existingTask = await this.taskModel.findOne({
         executionDate: dto.executionDate,
-        tasks: dto.tasks,
       });
 
-      await task.save();
-      return { message: 'Задача успешно добавлена в таблицу' };
+      if (!existingTask) {
+        const tasks = new this.taskModel({
+          userId: user._id,
+          executionDate: dto.executionDate,
+          tasks: dto.tasks,
+        });
+
+        await tasks.save();
+        return { message: 'Новая задача успешно создана' };
+      } else {
+        await this.taskModel.updateOne(
+          { userId: user._id, executionDate: dto.executionDate },
+          { $push: { tasks: { $each: dto.tasks } } },
+          { new: true },
+        );
+        return { message: 'Задача добавлена в таблицу' };
+      }
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
         throw new UnprocessableEntityException(e);
@@ -59,9 +72,11 @@ export class TasksService {
         filter = { userId: user._id };
       }
     }
-    console.log('Filter:', filter);
-    console.log('isEmployee:', isEmployee);
-    return this.taskModel.findOne(filter);
+    return this.taskModel.findOne(filter).populate({
+      path: 'userId',
+      select: 'firstname lastname position',
+      populate: { path: 'position' },
+    });
   }
 
   async updateOne(id: Types.ObjectId, user: UserDocument, dto: CreateTaskDto) {
@@ -97,23 +112,27 @@ export class TasksService {
     }
   }
 
-  async deleteOne(id: Types.ObjectId, user: UserDocument) {
+  async deleteOne(id: Types.ObjectId, taskId: string, user: UserDocument) {
     const task = await this.taskModel.findById(id);
     const isAdmin = user.role === Role.Admin;
     const isEmployee = user.role === Role.Employee;
 
     if (!task) {
-      throw new NotFoundException('Объект не найден');
+      throw new NotFoundException('Задача не найдена');
     }
 
     if (isAdmin) {
-      await this.taskModel.findOneAndDelete(id);
-      return { message: 'Столбец удален из таблицы задач' };
+      await this.taskModel.findByIdAndUpdate(id, {
+        $pull: { tasks: { _id: taskId } },
+      });
+      return { message: 'Задача удалена из таблицы задач' };
     }
 
     if (isEmployee && user._id.equals(task.userId)) {
-      await this.taskModel.findOneAndDelete({ _id: id, userId: user._id });
-      return { message: 'Столбец удален из таблицы задач' };
+      await this.taskModel.findByIdAndUpdate(id, {
+        $pull: { tasks: { _id: taskId } },
+      });
+      return { message: 'Задача удалена из таблицы задач' };
     } else {
       throw new UnauthorizedException();
     }

@@ -41,7 +41,6 @@ export class TasksController {
     @Query('userId') userId: string,
     @Query('date') date: string,
   ) {
-    console.log(date);
     return this.tasksService.getAll(user, userId, date);
   }
 
@@ -63,7 +62,10 @@ export class TasksController {
   deleteOne(
     @GetUser() user: UserDocument,
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+    @Query('taskId') taskId: string,
   ) {
-    return this.tasksService.deleteOne(id, user);
+    console.log(id);
+    console.log(taskId);
+    return this.tasksService.deleteOne(id, taskId, user);
   }
 }

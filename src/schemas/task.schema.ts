@@ -12,7 +12,6 @@ export class Task {
   @Prop({ required: true, type: Date, default: new Date() })
   executionDate: Date;
 
-  // @Prop({ required: true, type: GetTaskInfoDto })
   @Prop([
     {
       startTime: {
