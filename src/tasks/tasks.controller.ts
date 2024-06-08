@@ -44,6 +44,16 @@ export class TasksController {
     return this.tasksService.getAll(user, userId, date);
   }
 
+  @UseGuards(TokenAuthGuard)
+  @Get('info/:id')
+  getOne(
+    @GetUser() user: UserDocument,
+    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+    @Query('taskId') taskId: string,
+  ) {
+    return this.tasksService.getOne(user, id, taskId);
+  }
+
   @Roles(Role.Employee)
   @UseGuards(TokenAuthGuard, RolesGuard)
   @UsePipes(new ValidationPipe())
@@ -64,8 +74,6 @@ export class TasksController {
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
     @Query('taskId') taskId: string,
   ) {
-    console.log(id);
-    console.log(taskId);
     return this.tasksService.deleteOne(id, taskId, user);
   }
 }

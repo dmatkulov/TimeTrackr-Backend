@@ -79,6 +79,50 @@ export class TasksService {
     });
   }
 
+  async getOne(user: UserDocument, id: Types.ObjectId, taskId: string) {
+    let filter: FilterQuery<TaskDocument> = {};
+    const isAdmin = user.role === Role.Admin;
+    const isEmployee = user.role === Role.Employee;
+    const existingDesk = await this.taskModel.findById(id);
+
+    if (isAdmin) {
+      filter = {
+        _id: id,
+        'tasks._id': new Types.ObjectId(taskId),
+      };
+    }
+
+    if (isEmployee && user._id.equals(existingDesk.userId)) {
+      filter = {
+        _id: id,
+        userId: user._id,
+        'tasks._id': new Types.ObjectId(taskId),
+      };
+    } else {
+      throw new UnauthorizedException();
+    }
+
+    const taskDocument = await this.taskModel
+      .findOne(filter, { 'tasks.$': 1, userId: 1, executionDate: 1 })
+      .populate({
+        path: 'userId',
+        select: 'firstname lastname',
+      });
+
+    if (!taskDocument) {
+      throw new NotFoundException('Задача не найдена');
+    }
+
+    const task = taskDocument.tasks[0];
+
+    return {
+      _id: taskDocument._id,
+      userId: taskDocument.userId,
+      executionDate: taskDocument.executionDate,
+      task,
+    };
+  }
+
   async updateOne(id: Types.ObjectId, user: UserDocument, dto: CreateTaskDto) {
     const task = await this.taskModel.findById(id);
 
