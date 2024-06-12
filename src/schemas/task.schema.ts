@@ -4,13 +4,16 @@ import mongoose, { Document } from 'mongoose';
 import { GetTaskInfoDto } from '../dto/get-taskInfo.dto';
 import { Type } from 'class-transformer';
 
-@Schema({ timestamps: true })
+@Schema()
 export class Task {
   @Prop({ ref: User.name, required: true })
   userId: mongoose.Schema.Types.ObjectId;
 
   @Prop({ required: true, type: Date, default: new Date() })
   executionDate: Date;
+
+  @Prop({ required: true, type: Number, default: 0 })
+  totalTimeSpent: number;
 
   @Prop([
     {
@@ -21,7 +24,7 @@ export class Task {
         type: String,
       },
       timeSpent: {
-        type: String,
+        type: Number,
       },
       title: {
         type: String,

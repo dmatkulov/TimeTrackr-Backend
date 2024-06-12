@@ -12,10 +12,6 @@ export class GetTaskInfoDto {
 
   @IsString()
   @IsNotEmpty()
-  timeSpent: string;
-
-  @IsString()
-  @IsNotEmpty()
   title: string;
 
   @IsOptional()
@@ -25,8 +21,4 @@ export class GetTaskInfoDto {
   @IsNotEmpty()
   @IsEnum(TaskLabel)
   label: TaskLabel;
-
-  getTime() {
-    this.startTime;
-  }
 }

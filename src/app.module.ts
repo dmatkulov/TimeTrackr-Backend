@@ -19,6 +19,7 @@ import { TasksController } from './tasks/tasks.controller';
 import { TokenAuthGuard } from './auth/token.guard';
 import { FixturesService } from './seedCommand/fixtures.service';
 import { SeedCommandService } from './seedCommand/seed.command.service';
+import { CalculatorService } from './calculator/calculator.service';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { SeedCommandService } from './seedCommand/seed.command.service';
 
     SeedCommandService,
     FixturesService,
+    CalculatorService,
   ],
 })
 export class AppModule {}

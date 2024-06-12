@@ -10,12 +10,14 @@ import mongoose, { FilterQuery, Model, Types } from 'mongoose';
 import { UserDocument } from '../schemas/user.schema';
 import { CreateTaskDto } from '../dto/create-task.dto';
 import { Role } from '../enums/role.enum';
+import { CalculatorService } from '../calculator/calculator.service';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectModel(Task.name)
     private taskModel: Model<TaskDocument>,
+    private readonly CalculatorService: CalculatorService,
   ) {}
 
   async createOne(user: UserDocument, dto: CreateTaskDto) {
@@ -24,22 +26,51 @@ export class TasksService {
         executionDate: dto.executionDate,
       });
 
+      const tasksWithTimeSpent = dto.tasks.reduce((acc, taskDto) => {
+        const result = {
+          ...taskDto,
+          timeSpent: CalculatorService.calculate(
+            taskDto.startTime,
+            taskDto.endTime,
+          ),
+        };
+        acc.push(result);
+        return acc;
+      }, []);
+
+      const totalTimeSpent = tasksWithTimeSpent.reduce((acc, task) => {
+        return acc + task.timeSpent;
+      }, 0);
+
       if (!existingTask) {
         const tasks = new this.taskModel({
           userId: user._id,
           executionDate: dto.executionDate,
-          tasks: dto.tasks,
+          totalTimeSpent,
+          tasks: tasksWithTimeSpent,
         });
 
         await tasks.save();
-        return { message: 'Новая задача успешно создана' };
+        return { message: 'Новая задача создана', tasks };
       } else {
-        await this.taskModel.updateOne(
+        const result = await this.taskModel.updateOne(
           { userId: user._id, executionDate: dto.executionDate },
-          { $push: { tasks: { $each: dto.tasks } } },
+          {
+            $push: {
+              tasks: { $each: tasksWithTimeSpent },
+            },
+            $set: {
+              totalTimeSpent: existingTask.totalTimeSpent + totalTimeSpent,
+            },
+          },
           { new: true },
         );
-        return { message: 'Задача добавлена в таблицу' };
+
+        if (result.matchedCount === 0) {
+          return new NotFoundException('Задача не найдена');
+        }
+
+        return { message: 'Задача обновлена в таблицу' };
       }
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
@@ -106,7 +137,7 @@ export class TasksService {
       .findOne(filter, { 'tasks.$': 1, userId: 1, executionDate: 1 })
       .populate({
         path: 'userId',
-        select: 'firstname lastname',
+        select: 'firstname lastname photo',
       });
 
     if (!taskDocument) {
