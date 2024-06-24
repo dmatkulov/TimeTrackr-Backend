@@ -13,10 +13,8 @@ export class FixturesService {
   constructor(
     @InjectModel(Position.name)
     private readonly positionModel: Model<Position>,
-
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
-
     @InjectModel(Task.name)
     private readonly taskModel: Model<TaskDocument>,
   ) {}
@@ -140,54 +138,36 @@ export class FixturesService {
 
     await this.taskModel.create(
       {
-        userId: users[1]._id,
-        executionDate: '2024-04-29T09:00:00.000+00:00',
+        userId: users[0]._id,
+        totalTimeSpent: 7200,
         tasks: [
           {
             startTime: '09:00',
-            endTime: '11:00',
-            timeSpent: '2 hours',
+            endTime: '10:00',
+            timeSpent: 3600,
             title: 'Созвон с клиентом',
             description: 'Обсуждение правко по сделанной работе',
             label: TaskLabel.Management,
           },
           {
             startTime: '11:30',
-            endTime: '13:30',
-            timeSpent: '2 hours',
+            endTime: '12:30',
+            timeSpent: 3600,
             title: 'Подготовка отчета',
             description:
               'Сбор и анализ данных для подготовки еженедельного отчета',
             label: TaskLabel.Management,
           },
-          {
-            startTime: '14:00',
-            endTime: '16:00',
-            timeSpent: '2 hours',
-            title: 'Тестирование нового функционала',
-            description:
-              'Проведение тестов для проверки работоспособности новых функций',
-            label: TaskLabel.Management,
-          },
-          {
-            startTime: '16:30',
-            endTime: '18:00',
-            timeSpent: '2 hours',
-            title: 'Обучение новых сотрудников',
-            description:
-              'Проведение обучающего семинара для новых сотрудников отдела',
-            label: TaskLabel.Management,
-          },
         ],
       },
       {
-        userId: users[2]._id,
-        executionDate: '2024-04-30T12:00:00.000+00:00',
+        userId: users[1]._id,
+        totalTimeSpent: 32400,
         tasks: [
           {
             startTime: '09:00',
             endTime: '18:00',
-            timeSpent: '2 hours',
+            timeSpent: 32400,
             title: 'Разработка нового функционала',
             description: 'Программирование и тестирование новых функций.',
             label: TaskLabel.NewTask,
@@ -196,12 +176,12 @@ export class FixturesService {
       },
       {
         userId: users[2]._id,
-        executionDate: '2024-05-01T12:00:00.000+00:00',
+        totalTimeSpent: 32400,
         tasks: [
           {
-            startTime: '11:30',
-            endTime: '18:30',
-            timeSpent: '2 hours',
+            startTime: '09:00',
+            endTime: '18:00',
+            timeSpent: 32400,
             title: 'Отладка и исправление ошибок',
             description: 'Поиск и устранение ошибок в существующем коде.',
             label: TaskLabel.NewTask,
@@ -210,20 +190,20 @@ export class FixturesService {
       },
       {
         userId: users[3]._id,
-        executionDate: '2024-05-02T12:00:00.000+00:00',
+        totalTimeSpent: 32400,
         tasks: [
           {
             startTime: '09:00',
-            endTime: '15:00',
-            timeSpent: '2 hours',
+            endTime: '14:00',
+            timeSpent: 18000,
             title: 'Создание макетов интерфейса',
             description: 'Разработка дизайна для новых экранов приложения.',
             label: TaskLabel.NewTask,
           },
           {
-            startTime: '16:00',
+            startTime: '14:00',
             endTime: '18:00',
-            timeSpent: '2 hours',
+            timeSpent: 14400,
             title: 'Обратная связь и корректировки',
             description:
               'Обсуждение и внесение изменений в дизайн по обратной связи.',
@@ -233,20 +213,20 @@ export class FixturesService {
       },
       {
         userId: users[4]._id,
-        executionDate: '2024-04-29T12:00:00.000+00:00',
+        totalTimeSpent: 32400,
         tasks: [
           {
-            startTime: '10:00',
+            startTime: '09:00',
             endTime: '14:00',
-            timeSpent: '2 hours',
+            timeSpent: 18000,
             title: 'Анализ и оптимизация производительности базы данных.',
             description: 'Test description2',
             label: TaskLabel.NewTask,
           },
           {
             startTime: '14:00',
-            endTime: '19:00',
-            timeSpent: '2 hours',
+            endTime: '18:00',
+            timeSpent: 14400,
             title: 'Разработка нового API-метода',
             description:
               'Написание кода для нового API-метода и его тестирование.',
@@ -255,13 +235,13 @@ export class FixturesService {
         ],
       },
       {
-        userId: users[4]._id,
-        executionDate: '2021-04-30T12:33:00.000+00:00',
+        userId: users[5]._id,
+        totalTimeSpent: 32400,
         tasks: [
           {
             startTime: '09:00',
-            endTime: '17:00',
-            timeSpent: '2 hours',
+            endTime: '18:00',
+            timeSpent: 32400,
             title: 'Интеграция с внешними сервисами',
             description:
               'Разработка кода для интеграции с внешними сервисами и API.',

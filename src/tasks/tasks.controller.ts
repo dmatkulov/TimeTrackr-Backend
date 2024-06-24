@@ -21,6 +21,7 @@ import { Roles } from '../decorators/roles.decorator';
 import { Role } from '../enums/role.enum';
 import { ParseObjectIdPipe } from 'nestjs-object-id';
 import { Types } from 'mongoose';
+import { GetTaskInfoDto } from '../dto/get-taskInfo.dto';
 
 @Controller('tasks')
 export class TasksController {
@@ -61,9 +62,10 @@ export class TasksController {
   updateOne(
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
     @GetUser() user: UserDocument,
-    @Body() dto: CreateTaskDto,
+    @Query('taskId') taskId: string,
+    @Body() dto: GetTaskInfoDto,
   ) {
-    return this.tasksService.updateOne(id, user, dto);
+    return this.tasksService.updateOne(id, user, dto, taskId);
   }
 
   @Roles(Role.Employee, Role.Admin)

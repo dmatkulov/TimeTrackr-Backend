@@ -11,19 +11,20 @@ import { UserDocument } from '../schemas/user.schema';
 import { CreateTaskDto } from '../dto/create-task.dto';
 import { Role } from '../enums/role.enum';
 import { CalculatorService } from '../calculator/calculator.service';
+import { GetTaskInfoDto } from '../dto/get-taskInfo.dto';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectModel(Task.name)
     private taskModel: Model<TaskDocument>,
-    private readonly CalculatorService: CalculatorService,
   ) {}
 
   async createOne(user: UserDocument, dto: CreateTaskDto) {
     try {
       const existingTask = await this.taskModel.findOne({
         executionDate: dto.executionDate,
+        userId: user._id,
       });
 
       const tasksWithTimeSpent = dto.tasks.reduce((acc, taskDto) => {
@@ -42,18 +43,8 @@ export class TasksService {
         return acc + task.timeSpent;
       }, 0);
 
-      if (!existingTask) {
-        const tasks = new this.taskModel({
-          userId: user._id,
-          executionDate: dto.executionDate,
-          totalTimeSpent,
-          tasks: tasksWithTimeSpent,
-        });
-
-        await tasks.save();
-        return { message: 'Новая задача создана', tasks };
-      } else {
-        const result = await this.taskModel.updateOne(
+      if (existingTask) {
+        const task = await this.taskModel.findOneAndUpdate(
           { userId: user._id, executionDate: dto.executionDate },
           {
             $push: {
@@ -66,11 +57,17 @@ export class TasksService {
           { new: true },
         );
 
-        if (result.matchedCount === 0) {
-          return new NotFoundException('Задача не найдена');
-        }
+        return { message: 'Задача добавлена в таблицу', task };
+      } else {
+        const tasks = new this.taskModel({
+          userId: user._id,
+          executionDate: dto.executionDate,
+          totalTimeSpent,
+          tasks: tasksWithTimeSpent,
+        });
 
-        return { message: 'Задача обновлена в таблицу' };
+        await tasks.save();
+        return { message: 'Новая задача создана', tasks };
       }
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
@@ -154,27 +151,60 @@ export class TasksService {
     };
   }
 
-  async updateOne(id: Types.ObjectId, user: UserDocument, dto: CreateTaskDto) {
-    const task = await this.taskModel.findById(id);
+  async updateOne(
+    id: Types.ObjectId,
+    user: UserDocument,
+    dto: GetTaskInfoDto,
+    taskId: string,
+  ) {
+    let filter: FilterQuery<TaskDocument> = {};
+    const isEmployee = user.role === Role.Employee;
+    const existingTicket = await this.taskModel.findById(id);
 
-    if (!task) {
+    if (!existingTicket) {
       throw new NotFoundException('Объект не найден');
     }
 
-    if (user._id.equals(task.userId)) {
+    if (isEmployee && user._id.equals(existingTicket.userId)) {
       try {
-        const update = {
-          executionDate: dto.executionDate,
-          tasks: dto.tasks,
+        filter = {
+          userId: user._id,
+          'tasks._id': new Types.ObjectId(taskId),
         };
 
-        const task = await this.taskModel.findOneAndUpdate(
-          id,
-          { $set: update },
+        const timeSpent = CalculatorService.calculate(
+          dto.startTime,
+          dto.endTime,
+        );
+
+        const update = {
+          $set: {
+            'tasks.$.startTime': dto.startTime,
+            'tasks.$.endTime': dto.endTime,
+            'tasks.$.title': dto.title,
+            'tasks.$.description': dto.description,
+            'tasks.$.label': dto.label,
+            'tasks.$.timeSpent': timeSpent,
+          },
+        };
+
+        await this.taskModel.updateOne(filter, update);
+        const updatedTicket = await this.taskModel.findById(id);
+
+        const totalTimeSpent = updatedTicket.tasks.reduce((total, task) => {
+          return total + task.timeSpent;
+        }, 0);
+
+        await this.taskModel.updateOne(
+          { userId: user._id, _id: id },
+          {
+            $set: {
+              totalTimeSpent: totalTimeSpent,
+            },
+          },
           { new: true },
         );
 
-        await task.save();
         return { message: 'Задача обновлена' };
       } catch (e) {
         if (e instanceof mongoose.Error.ValidationError) {
@@ -192,24 +222,51 @@ export class TasksService {
     const isAdmin = user.role === Role.Admin;
     const isEmployee = user.role === Role.Employee;
 
+    let filter: FilterQuery<TaskDocument>;
+
     if (!task) {
       throw new NotFoundException('Задача не найдена');
     }
 
     if (isAdmin) {
-      await this.taskModel.findByIdAndUpdate(id, {
-        $pull: { tasks: { _id: taskId } },
-      });
-      return { message: 'Задача удалена из таблицы задач' };
-    }
-
-    if (isEmployee && user._id.equals(task.userId)) {
-      await this.taskModel.findByIdAndUpdate(id, {
-        $pull: { tasks: { _id: taskId } },
-      });
-      return { message: 'Задача удалена из таблицы задач' };
+      filter = { _id: id };
+    } else if (isEmployee && user._id.equals(task.userId)) {
+      filter = { _id: id, userId: user._id };
     } else {
       throw new UnauthorizedException();
     }
+
+    const updatedTask = await this.taskModel.findByIdAndUpdate(
+      filter,
+      {
+        $pull: { tasks: { _id: taskId } },
+      },
+      { new: true },
+    );
+
+    if (!updatedTask) {
+      throw new NotFoundException('Задача не найдена после обновления');
+    }
+
+    if (updatedTask.tasks.length === 0) {
+      await this.taskModel.findByIdAndDelete(id);
+      return { message: 'Таблица полностью очищена' };
+    }
+
+    const updatedTimeSpent = updatedTask.tasks.reduce((total, task) => {
+      return total + task.timeSpent;
+    }, 0);
+
+    await this.taskModel.findOneAndUpdate(
+      id,
+      {
+        $set: {
+          totalTimeSpent: updatedTimeSpent,
+        },
+      },
+      { new: true },
+    );
+
+    return { message: 'Задача удалена из таблицы задач' };
   }
 }

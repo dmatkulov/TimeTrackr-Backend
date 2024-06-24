@@ -21,4 +21,6 @@ export class GetTaskInfoDto {
   @IsNotEmpty()
   @IsEnum(TaskLabel)
   label: TaskLabel;
+
+  timeSpent: number;
 }

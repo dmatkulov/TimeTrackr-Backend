@@ -9,7 +9,11 @@ export class Task {
   @Prop({ ref: User.name, required: true })
   userId: mongoose.Schema.Types.ObjectId;
 
-  @Prop({ required: true, type: Date, default: new Date() })
+  @Prop({
+    required: true,
+    type: Date,
+    default: () => new Date().setUTCHours(0, 0, 0, 0),
+  })
   executionDate: Date;
 
   @Prop({ required: true, type: Number, default: 0 })
