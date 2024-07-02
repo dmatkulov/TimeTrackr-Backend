@@ -142,12 +142,19 @@ export class TasksService {
     }
 
     const task = taskDocument.tasks[0];
+    const author = taskDocument.userId;
 
     return {
-      _id: taskDocument._id,
-      userId: taskDocument.userId,
+      globalId: taskDocument._id,
+      author,
       executionDate: taskDocument.executionDate,
-      task,
+      _id: task._id,
+      startTime: task.startTime,
+      endTime: task.endTime,
+      timeSpent: task.timeSpent,
+      title: task.title,
+      description: task.description,
+      label: task.label,
     };
   }
 
@@ -168,6 +175,7 @@ export class TasksService {
     if (isEmployee && user._id.equals(existingTicket.userId)) {
       try {
         filter = {
+          _id: id,
           userId: user._id,
           'tasks._id': new Types.ObjectId(taskId),
         };
