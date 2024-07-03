@@ -14,7 +14,7 @@ import { PositionsService } from './positions.service';
 import { Roles } from '../decorators/roles.decorator';
 import { Role } from '../enums/role.enum';
 import { RolesGuard } from '../auth/roles.guard';
-import { TokenAuthGuard } from '../auth/token.guard';
+import { JWTGuard } from '../auth/token.guard';
 import { CreatePositionDto } from '../dto/create-position.dto';
 import { ParseObjectIdPipe } from 'nestjs-object-id';
 import { Types } from 'mongoose';
@@ -24,7 +24,7 @@ export class PositionsController {
   constructor(private readonly positionsService: PositionsService) {}
 
   @Roles(Role.Admin)
-  @UseGuards(TokenAuthGuard, RolesGuard)
+  @UseGuards(JWTGuard, RolesGuard)
   @Post('new-position')
   @UsePipes(new ValidationPipe())
   @Post()
@@ -32,21 +32,21 @@ export class PositionsController {
     return this.positionsService.createOne(dto);
   }
 
-  @UseGuards(TokenAuthGuard, RolesGuard)
+  @UseGuards(JWTGuard, RolesGuard)
   @Get()
   getAll() {
     return this.positionsService.getAll();
   }
 
   @Roles(Role.Admin)
-  @UseGuards(TokenAuthGuard, RolesGuard)
+  @UseGuards(JWTGuard, RolesGuard)
   @Get('info/:id')
   getOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
     return this.positionsService.getOne(id);
   }
 
   @Roles(Role.Admin)
-  @UseGuards(TokenAuthGuard, RolesGuard)
+  @UseGuards(JWTGuard, RolesGuard)
   @Patch('edit/:id')
   @UsePipes(new ValidationPipe())
   updateOne(
@@ -57,7 +57,7 @@ export class PositionsController {
   }
 
   @Roles(Role.Admin)
-  @UseGuards(TokenAuthGuard, RolesGuard)
+  @UseGuards(JWTGuard, RolesGuard)
   @Delete('delete/:id')
   deleteOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
     return this.positionsService.deleteOne(id);

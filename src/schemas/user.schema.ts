@@ -1,15 +1,18 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { compare, genSalt, hash } from 'bcrypt';
 import mongoose, { Document } from 'mongoose';
+import * as jwt from 'jsonwebtoken';
 import { GetContactInfoDto } from '../dto/get-contactInfo.dto';
-import { randomUUID } from 'crypto';
 import { Role } from '../enums/role.enum';
 import { Position } from './position.schema';
 
 const SALT_WORK_FACTOR = 10;
+const JWT_SECRET = process.env.SECRET_KEY || 'secret_KEY';
+const JWT_EXPIRATION = '24h';
 
 export interface UserMethods {
   generateToken: () => void;
+
   checkPassword(password: string): Promise<boolean>;
 }
 
@@ -52,7 +55,8 @@ export class User {
 export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.methods.generateToken = function () {
-  this.token = randomUUID();
+  const payload = { role: this.role, email: this.email };
+  this.token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRATION });
 };
 
 UserSchema.methods.checkPassword = function (password: string) {

@@ -16,10 +16,11 @@ import { PositionsController } from './position/positions.controller';
 import { Task, TaskSchema } from './schemas/task.schema';
 import { TasksService } from './tasks/tasks.service';
 import { TasksController } from './tasks/tasks.controller';
-import { TokenAuthGuard } from './auth/token.guard';
+import { JWTGuard } from './auth/token.guard';
 import { FixturesService } from './seedCommand/fixtures.service';
 import { SeedCommandService } from './seedCommand/seed.command.service';
 import { CalculatorService } from './calculator/calculator.service';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -31,6 +32,10 @@ import { CalculatorService } from './calculator/calculator.service';
     MongooseModule.forFeature([{ name: Task.name, schema: TaskSchema }]),
     PassportModule,
     CommandModule,
+    JwtModule.register({
+      secret: process.env.SECRET_KEY || 'secret_KEY',
+      signOptions: { expiresIn: '24h' },
+    }),
   ],
   controllers: [
     AppController,
@@ -43,7 +48,7 @@ import { CalculatorService } from './calculator/calculator.service';
     AuthService,
     LocalStrategy,
     RolesGuard,
-    TokenAuthGuard,
+    JWTGuard,
 
     UsersService,
     PositionsService,
