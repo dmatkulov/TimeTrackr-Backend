@@ -13,12 +13,19 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { Request } from 'express';
 import { Role } from '../enums/role.enum';
 import { UpdateUserDto } from '../dto/update-user.dto';
+import { OAuth2Client } from 'google-auth-library';
+import { randomUUID } from 'crypto';
+import { Position, PositionDocument } from '../schemas/position.schema';
+
+const client = new OAuth2Client(process.env['GOOGLE_CLIENT_ID']);
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name)
     private userModel: Model<UserDocument>,
+    @InjectModel(Position.name)
+    private positionModel: Model<PositionDocument>,
   ) {}
 
   async createOne(file: Express.Multer.File, createUserDto: CreateUserDto) {
@@ -57,6 +64,54 @@ export class UsersService {
       .findById(activeUser._id)
       .populate('position');
     return { message: `С возвращением, ${user.firstname}!`, user };
+  }
+
+  async google(req: Request) {
+    const ticket = await client.verifyIdToken({
+      idToken: req.body.credential,
+      audience: process.env['GOOGLE_CLIENT_ID'],
+    });
+
+    const payload = ticket.getPayload();
+
+    if (!payload) {
+      throw new BadRequestException('Google login error!');
+    }
+
+    const id = payload['sub'];
+    const email = payload['email'];
+    const firstname = payload['given_name'];
+    const lastname = payload['family_name'];
+    const photo = payload['picture'];
+    const position = await this.positionModel.findOne({ name: 'Не назначено' });
+
+    if (!email) {
+      throw new BadRequestException('Email is not present!');
+    }
+
+    let user = await this.userModel.findOne({ googleID: id });
+
+    let message;
+    if (!user) {
+      user = new this.userModel({
+        email,
+        firstname,
+        lastname,
+        position,
+        photo,
+        password: randomUUID(),
+        googleID: id,
+        isGoogleUser: true,
+      });
+
+      message = `Привет, ${user.firstname}`;
+    }
+
+    user.generateToken();
+    await user.save();
+    message = `С возвращением, ${user.firstname}!`;
+
+    return { message, user };
   }
 
   async logOut(req: Request) {

@@ -35,6 +35,7 @@ export class FixturesService {
       },
       { name: 'Дизайнер интерфейсов', tag: 'cyan' },
       { name: 'Бэкенд-разработчик', tag: 'purple' },
+      { name: 'Не назначено', tag: 'default' },
     );
 
     const users = await this.userModel.create(

@@ -66,6 +66,11 @@ export class UsersController {
     return this.userService.login(user);
   }
 
+  @Post('google')
+  googleLogin(@Req() req: Request) {
+    return this.userService.google(req);
+  }
+
   @Roles(Role.Admin)
   @UseGuards(JWTGuard, RolesGuard)
   @Get()
