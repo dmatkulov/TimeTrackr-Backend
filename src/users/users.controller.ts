@@ -25,7 +25,7 @@ import { Role } from '../enums/role.enum';
 import { RolesGuard } from '../auth/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
-import { TokenAuthGuard } from '../auth/token.guard';
+import { JWTGuard } from '../auth/token.guard';
 import { GetUser } from '../decorators/get-user.decorator';
 import { UserDocument } from '../schemas/user.schema';
 import { randomUUID } from 'crypto';
@@ -38,7 +38,7 @@ export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @Roles(Role.Admin)
-  @UseGuards(TokenAuthGuard, RolesGuard)
+  @UseGuards(JWTGuard, RolesGuard)
   @UsePipes(new ValidationPipe())
   @Post('register-user')
   @UseInterceptors(
@@ -67,7 +67,7 @@ export class UsersController {
   }
 
   @Roles(Role.Admin)
-  @UseGuards(TokenAuthGuard, RolesGuard)
+  @UseGuards(JWTGuard, RolesGuard)
   @Get()
   getAll(
     @Query('positions') positions: string,
@@ -78,14 +78,14 @@ export class UsersController {
   }
 
   @Roles(Role.Admin)
-  @UseGuards(TokenAuthGuard, RolesGuard)
+  @UseGuards(JWTGuard, RolesGuard)
   @Get('info/:id')
   getOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
     return this.userService.getOne(id);
   }
 
   @Roles(Role.Admin, Role.Employee)
-  @UseGuards(TokenAuthGuard, RolesGuard)
+  @UseGuards(JWTGuard, RolesGuard)
   @Patch('edit/:id')
   @UsePipes(new ValidationPipe())
   @UseInterceptors(
@@ -110,13 +110,13 @@ export class UsersController {
   }
 
   @Roles(Role.Admin)
-  @UseGuards(TokenAuthGuard, RolesGuard)
+  @UseGuards(JWTGuard, RolesGuard)
   @Delete('delete/:id')
   deleteOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
     return this.userService.deleteOne(id);
   }
 
-  @UseGuards(TokenAuthGuard)
+  @UseGuards(JWTGuard)
   @Delete('sessions')
   logOut(@Req() req: Request) {
     return this.userService.logOut(req);

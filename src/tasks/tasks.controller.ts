@@ -12,7 +12,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { RolesGuard } from '../auth/roles.guard';
-import { TokenAuthGuard } from '../auth/token.guard';
+import { JWTGuard } from '../auth/token.guard';
 import { TasksService } from './tasks.service';
 import { GetUser } from '../decorators/get-user.decorator';
 import { UserDocument } from '../schemas/user.schema';
@@ -28,14 +28,14 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Roles(Role.Employee)
-  @UseGuards(TokenAuthGuard, RolesGuard)
+  @UseGuards(JWTGuard, RolesGuard)
   @UsePipes(new ValidationPipe())
   @Post('new-task')
   createOne(@GetUser() user: UserDocument, @Body() dto: CreateTaskDto) {
     return this.tasksService.createOne(user, dto);
   }
 
-  @UseGuards(TokenAuthGuard)
+  @UseGuards(JWTGuard)
   @Get()
   getAll(
     @GetUser() user: UserDocument,
@@ -45,7 +45,7 @@ export class TasksController {
     return this.tasksService.getAll(user, userId, date);
   }
 
-  @UseGuards(TokenAuthGuard)
+  @UseGuards(JWTGuard)
   @Get('info/:id')
   getOne(
     @GetUser() user: UserDocument,
@@ -56,7 +56,7 @@ export class TasksController {
   }
 
   @Roles(Role.Employee)
-  @UseGuards(TokenAuthGuard, RolesGuard)
+  @UseGuards(JWTGuard, RolesGuard)
   @UsePipes(new ValidationPipe())
   @Patch('edit/:id')
   updateOne(
@@ -69,7 +69,7 @@ export class TasksController {
   }
 
   @Roles(Role.Employee, Role.Admin)
-  @UseGuards(TokenAuthGuard, RolesGuard)
+  @UseGuards(JWTGuard, RolesGuard)
   @Delete('delete/:id')
   deleteOne(
     @GetUser() user: UserDocument,
