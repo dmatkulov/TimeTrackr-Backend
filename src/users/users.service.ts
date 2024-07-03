@@ -89,11 +89,11 @@ export class UsersService {
       throw new BadRequestException('Email is not present!');
     }
 
-    let user = await this.userModel.findOne({ googleID: id });
+    let googleUser = await this.userModel.findOne({ googleID: id });
 
-    let message;
-    if (!user) {
-      user = new this.userModel({
+    let message: string;
+    if (!googleUser) {
+      googleUser = new this.userModel({
         email,
         firstname,
         lastname,
@@ -104,12 +104,16 @@ export class UsersService {
         isGoogleUser: true,
       });
 
-      message = `Привет, ${user.firstname}`;
+      message = `Привет, ${googleUser.firstname}`;
     }
 
-    user.generateToken();
-    await user.save();
-    message = `С возвращением, ${user.firstname}!`;
+    googleUser.generateToken();
+    await googleUser.save();
+    message = `С возвращением, ${googleUser.firstname}!`;
+
+    const user = await this.userModel
+      .findOne({ googleID: id })
+      .populate('position');
 
     return { message, user };
   }
