@@ -16,6 +16,10 @@ export interface UserMethods {
   checkPassword(password: string): Promise<boolean>;
 }
 
+const validateGoogleUser = function (this: UserDocument) {
+  return !this.googleID;
+};
+
 @Schema()
 export class User {
   @Prop({ required: true, unique: true })
@@ -33,13 +37,16 @@ export class User {
   @Prop({ required: true })
   lastname: string;
 
-  @Prop({ required: true, type: GetContactInfoDto })
+  @Prop({ required: validateGoogleUser, type: GetContactInfoDto })
   contactInfo: GetContactInfoDto;
 
   @Prop({ required: false })
   photo: string;
 
-  @Prop({ ref: Position.name, required: true })
+  @Prop({
+    ref: Position.name,
+    required: validateGoogleUser,
+  })
   position: mongoose.Schema.Types.ObjectId;
 
   @Prop({
@@ -48,8 +55,14 @@ export class User {
   })
   role: Role;
 
-  @Prop({ required: true, type: Date, default: new Date() })
+  @Prop({ required: validateGoogleUser, type: Date, default: new Date() })
   startDate: Date;
+
+  @Prop({ required: false, type: String })
+  googleID?: string;
+
+  @Prop({ required: true, type: Boolean, default: false })
+  isGoogleUser?: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
