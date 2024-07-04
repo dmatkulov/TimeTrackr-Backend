@@ -32,7 +32,6 @@ export class PositionsController {
     return this.positionsService.createOne(dto);
   }
 
-  @UseGuards(JWTGuard, RolesGuard)
   @Get()
   getAll() {
     return this.positionsService.getAll();

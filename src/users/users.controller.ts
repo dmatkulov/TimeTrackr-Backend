@@ -37,8 +37,6 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
-  @Roles(Role.Admin)
-  @UseGuards(JWTGuard, RolesGuard)
   @UsePipes(new ValidationPipe())
   @Post('register-user')
   @UseInterceptors(

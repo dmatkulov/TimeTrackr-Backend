@@ -39,13 +39,12 @@ export class UsersService {
         contactInfo: createUserDto.contactInfo,
         position: createUserDto.position,
         roles: createUserDto.role,
-        startDate: createUserDto.startDate,
       });
 
       user.generateToken();
 
       await user.save();
-      return { message: 'Сотрудник успешно добавлен', user };
+      return { message: 'Регистрация прошла успешно', user };
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
         throw new UnprocessableEntityException(e);
@@ -105,11 +104,12 @@ export class UsersService {
       });
 
       message = `Привет, ${googleUser.firstname}`;
+    } else {
+      message = `С возвращением, ${googleUser.firstname}!`;
     }
 
     googleUser.generateToken();
     await googleUser.save();
-    message = `С возвращением, ${googleUser.firstname}!`;
 
     const user = await this.userModel
       .findOne({ googleID: id })
@@ -232,7 +232,6 @@ export class UsersService {
         contactInfo: dto.contactInfo,
         position: dto.position,
         roles: dto.role,
-        startDate: dto.startDate,
       };
 
       if (isEmployee && existingUser._id.equals(currentUser._id)) {

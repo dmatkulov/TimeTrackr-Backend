@@ -39,8 +39,4 @@ export class UpdateUserDto {
   @IsOptional()
   @IsEnum(Role)
   role: Role;
-
-  @Type(() => Date)
-  @IsNotEmpty()
-  startDate: Date;
 }

@@ -37,7 +37,7 @@ export class User {
   @Prop({ required: true })
   lastname: string;
 
-  @Prop({ required: validateGoogleUser, type: GetContactInfoDto })
+  @Prop({ required: false, type: GetContactInfoDto })
   contactInfo: GetContactInfoDto;
 
   @Prop({ required: false })
@@ -54,9 +54,6 @@ export class User {
     default: Role.Employee,
   })
   role: Role;
-
-  @Prop({ required: validateGoogleUser, type: Date, default: new Date() })
-  startDate: Date;
 
   @Prop({ required: false, type: String })
   googleID?: string;

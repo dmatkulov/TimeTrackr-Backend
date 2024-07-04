@@ -5,7 +5,6 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { GetContactInfoDto } from './get-contactInfo.dto';
@@ -32,7 +31,6 @@ export class CreateUserDto {
   @IsOptional()
   photo: string;
 
-  @ValidateNested({ each: true })
   @Type(() => GetContactInfoDto)
   contactInfo: GetContactInfoDto;
 
@@ -43,8 +41,4 @@ export class CreateUserDto {
   @IsOptional()
   @IsEnum(Role)
   role: Role;
-
-  @Type(() => Date)
-  @IsNotEmpty()
-  startDate: Date;
 }
