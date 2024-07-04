@@ -4,7 +4,6 @@ import { Position } from '../schemas/position.schema';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../schemas/user.schema';
 import { Role } from '../enums/role.enum';
-import { randomUUID } from 'crypto';
 import { TaskLabel } from '../enums/task-label.enum';
 import { Task, TaskDocument } from '../schemas/task.schema';
 
@@ -38,7 +37,7 @@ export class FixturesService {
       { name: 'Не назначено', tag: 'default' },
     );
 
-    const users = await this.userModel.create(
+    const usersData = [
       {
         email: 'admin@gmail.com',
         password: 'qwerty12',
@@ -52,7 +51,6 @@ export class FixturesService {
         photo: 'fixtures/avatars/dilshad.jpg',
         position: positions[0]._id,
         role: Role.Admin,
-        token: randomUUID(),
         startDate: '2018-04-27T12:00:00.000+00:00',
       },
       {
@@ -68,7 +66,6 @@ export class FixturesService {
         photo: 'fixtures/avatars/nazgul.jpg',
         position: positions[1]._id,
         role: Role.Employee,
-        token: randomUUID(),
         startDate: '2020-04-27T12:00:00.000+00:00',
       },
       {
@@ -84,7 +81,6 @@ export class FixturesService {
         photo: 'fixtures/avatars/maxim.jpg',
         position: positions[2]._id,
         role: Role.Employee,
-        token: randomUUID(),
         startDate: '2020-04-27T12:00:00.000+00:00',
       },
       {
@@ -100,7 +96,6 @@ export class FixturesService {
         photo: 'fixtures/avatars/jamal.jpg',
         position: positions[3]._id,
         role: Role.Employee,
-        token: randomUUID(),
         startDate: '2020-01-27T12:00:00.000+00:00',
       },
       {
@@ -116,7 +111,6 @@ export class FixturesService {
         photo: 'fixtures/avatars/john.jpg',
         position: positions[3]._id,
         role: Role.Employee,
-        token: randomUUID(),
         startDate: '2020-01-27T12:00:00.000+00:00',
       },
       {
@@ -132,10 +126,17 @@ export class FixturesService {
         photo: 'fixtures/avatars/bektur.jpg',
         position: positions[4]._id,
         role: Role.Employee,
-        token: randomUUID(),
         startDate: '2024-01-27T12:00:00.000+00:00',
       },
-    );
+    ];
+
+    for (const userData of usersData) {
+      const user = new this.userModel(userData);
+      user.generateToken();
+      await user.save();
+    }
+
+    const users = await this.userModel.find().exec();
 
     await this.taskModel.create(
       {

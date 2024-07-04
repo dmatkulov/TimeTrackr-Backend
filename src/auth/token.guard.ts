@@ -33,13 +33,23 @@ export class JWTGuard implements CanActivate {
       return false;
     }
 
+    const user = await this.userModel.findOne({ token });
+
+    if (!user) {
+      return false;
+    }
+
     try {
-      request['user'] = await this.jwtService.verifyAsync(token, {
+      request.user = await this.jwtService.verifyAsync(token, {
         secret: process.env.SECRET_KEY || 'secret_KEY',
       });
-    } catch {
+    } catch (error) {
       throw new UnauthorizedException();
     }
+
+    request.user = user;
+    request.user._id = user._id;
+
     return true;
   }
 }
