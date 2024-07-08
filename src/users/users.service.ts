@@ -30,7 +30,7 @@ export class UsersService {
 
   async createOne(file: Express.Multer.File, createUserDto: CreateUserDto) {
     try {
-      const user = new this.userModel({
+      const newUser = new this.userModel({
         email: createUserDto.email,
         password: createUserDto.password,
         firstname: createUserDto.firstname,
@@ -41,9 +41,13 @@ export class UsersService {
         roles: createUserDto.role,
       });
 
-      user.generateToken();
+      newUser.generateToken();
 
-      await user.save();
+      await newUser.save();
+
+      const user = await this.userModel
+        .findById(newUser._id)
+        .populate('position');
       return { message: 'Регистрация прошла успешно', user };
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
