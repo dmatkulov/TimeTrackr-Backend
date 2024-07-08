@@ -55,7 +55,17 @@ export class UsersService {
       }
 
       if (e instanceof mongo.MongoServerError && e.code === 11000) {
-        throw new BadRequestException('Такая почта уже была зарегистрирована');
+        const error = {
+          message: [
+            {
+              property: 'email',
+              message: 'Такая почта уже была зарегистрирована',
+            },
+          ],
+          error: 'Unprocessable Entity',
+          statusCode: 422,
+        };
+        throw new UnprocessableEntityException(error);
       }
 
       throw e;

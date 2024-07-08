@@ -5,6 +5,8 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  Matches,
+  MinLength,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { GetContactInfoDto } from './get-contactInfo.dto';
@@ -17,7 +19,10 @@ export class CreateUserDto {
   email: string;
 
   @IsString()
-  @IsNotEmpty()
+  @MinLength(8)
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$/, {
+    message: 'password too weak',
+  })
   password: string;
 
   @IsString()
