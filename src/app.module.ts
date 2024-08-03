@@ -2,26 +2,28 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './schemas/user.schema';
-import { UsersController } from './users/users.controller';
-import { UsersService } from './users/users.service';
-import { AuthService } from './auth/auth.service';
+import { User, UserSchema } from './user/shema/user.schema';
 import { PassportModule } from '@nestjs/passport';
-import { RolesGuard } from './auth/roles.guard';
+import { RolesGuard } from './utils/guards/roles.guard';
 import { LocalStrategy } from './auth/local.strategy';
 import { CommandModule } from 'nestjs-command';
 import { Position, PositionSchema } from './schemas/position.schema';
 import { PositionsService } from './position/positions.service';
 import { PositionsController } from './position/positions.controller';
-import { Task, TaskSchema } from './schemas/task.schema';
-import { TasksService } from './tasks/tasks.service';
-import { TasksController } from './tasks/tasks.controller';
-import { JWTGuard } from './auth/token.guard';
+import { Task, TaskSchema } from './task/shema/task.schema';
+import { TaskService } from './task/task.service';
+import { TaskController } from './task/task.controller';
+import { JWTGuard } from './utils/guards/token.guard';
 import { FixturesService } from './seedCommand/fixtures.service';
 import { SeedCommandService } from './seedCommand/seed.command.service';
 import { CalculatorService } from './calculator/calculator.service';
 import { JwtModule } from '@nestjs/jwt';
-import { TeamsModule } from './teams/teams.module';
+import { UserController } from './user/user.controller';
+import { UserService } from './user/user.service';
+import { TeamController } from './team/team.controller';
+import { TeamService } from './team/team.service';
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
 
 @Module({
   imports: [
@@ -37,24 +39,29 @@ import { TeamsModule } from './teams/teams.module';
       secret: process.env.SECRET_KEY || 'secret_KEY',
       signOptions: { expiresIn: '24h' },
     }),
-    TeamsModule,
   ],
   controllers: [
     AppController,
-    UsersController,
+
+    UserController,
+    AuthController,
+
+    TeamController,
     PositionsController,
-    TasksController,
+    TaskController,
   ],
   providers: [
     AppService,
-    AuthService,
     LocalStrategy,
     RolesGuard,
     JWTGuard,
 
-    UsersService,
+    UserService,
+    AuthService,
+
+    TeamService,
     PositionsService,
-    TasksService,
+    TaskService,
 
     SeedCommandService,
     FixturesService,

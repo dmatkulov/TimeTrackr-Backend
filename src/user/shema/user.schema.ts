@@ -2,9 +2,8 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { compare, genSalt, hash } from 'bcrypt';
 import mongoose, { Document } from 'mongoose';
 import * as jwt from 'jsonwebtoken';
-import { GetContactInfoDto } from '../dto/get-contactInfo.dto';
-import { Role } from '../enums/role.enum';
-import { Position } from './position.schema';
+import { Role } from '../../utils/enums/role.enum';
+import { Position } from '../../schemas/position.schema';
 
 const SALT_WORK_FACTOR = 10;
 const JWT_SECRET = process.env.SECRET_KEY || 'secret_KEY';
@@ -37,8 +36,8 @@ export class User {
   @Prop({ required: true })
   lastname: string;
 
-  @Prop({ required: false, type: GetContactInfoDto })
-  contactInfo: GetContactInfoDto;
+  @Prop({ required: false, type: String })
+  phoneNumber: string;
 
   @Prop({ required: false })
   photo: string;
@@ -51,15 +50,12 @@ export class User {
 
   @Prop({
     required: true,
-    default: Role.Employee,
+    default: Role.User,
   })
   role: Role;
 
   @Prop({ required: false, type: String })
   googleID?: string;
-
-  @Prop({ required: true, type: Boolean, default: false })
-  isGoogleUser?: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

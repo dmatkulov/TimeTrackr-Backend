@@ -5,16 +5,16 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Task, TaskDocument } from '../schemas/task.schema';
+import { Task, TaskDocument } from './shema/task.schema';
 import mongoose, { FilterQuery, Model, Types } from 'mongoose';
-import { UserDocument } from '../schemas/user.schema';
-import { CreateTaskDto } from '../dto/create-task.dto';
-import { Role } from '../enums/role.enum';
+import { UserDocument } from '../user/shema/user.schema';
+import { CreateTaskDto } from './dto/create-task.dto';
+import { Role } from '../utils/enums/role.enum';
 import { CalculatorService } from '../calculator/calculator.service';
-import { GetTaskInfoDto } from '../dto/get-taskInfo.dto';
+import { GetTaskInfoDto } from './dto/get-taskInfo.dto';
 
 @Injectable()
-export class TasksService {
+export class TaskService {
   constructor(
     @InjectModel(Task.name)
     private taskModel: Model<TaskDocument>,
@@ -81,7 +81,7 @@ export class TasksService {
   async getAll(user: UserDocument, userId: string, date: string) {
     let filter: FilterQuery<TaskDocument> = {};
     const isAdmin = user.role === Role.Admin;
-    const isEmployee = user.role === Role.Employee;
+    const isEmployee = user.role === Role.User;
 
     if (isAdmin) {
       if (userId && date) {
@@ -110,7 +110,7 @@ export class TasksService {
   async getOne(user: UserDocument, id: Types.ObjectId, taskId: string) {
     let filter: FilterQuery<TaskDocument> = {};
     const isAdmin = user.role === Role.Admin;
-    const isEmployee = user.role === Role.Employee;
+    const isEmployee = user.role === Role.User;
     const existingDesk = await this.taskModel.findById(id);
 
     if (isAdmin) {
@@ -165,7 +165,7 @@ export class TasksService {
     taskId: string,
   ) {
     let filter: FilterQuery<TaskDocument> = {};
-    const isEmployee = user.role === Role.Employee;
+    const isEmployee = user.role === Role.User;
     const existingTicket = await this.taskModel.findById(id);
 
     if (!existingTicket) {
@@ -228,7 +228,7 @@ export class TasksService {
   async deleteOne(id: Types.ObjectId, taskId: string, user: UserDocument) {
     const task = await this.taskModel.findById(id);
     const isAdmin = user.role === Role.Admin;
-    const isEmployee = user.role === Role.Employee;
+    const isEmployee = user.role === Role.User;
 
     let filter: FilterQuery<TaskDocument>;
 

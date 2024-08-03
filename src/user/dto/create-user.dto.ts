@@ -4,13 +4,12 @@ import {
   IsMongoId,
   IsNotEmpty,
   IsOptional,
+  IsPhoneNumber,
   IsString,
   Matches,
   MinLength,
 } from 'class-validator';
-import { Type } from 'class-transformer';
-import { GetContactInfoDto } from './get-contactInfo.dto';
-import { Role } from '../enums/role.enum';
+import { Role } from '../../utils/enums/role.enum';
 import mongoose from 'mongoose';
 
 export class CreateUserDto {
@@ -36,8 +35,8 @@ export class CreateUserDto {
   @IsOptional()
   photo: string;
 
-  @Type(() => GetContactInfoDto)
-  contactInfo: GetContactInfoDto;
+  @IsPhoneNumber('KG', { message: 'Неверный формат номера телефона' })
+  phoneNumber: string;
 
   @IsNotEmpty()
   @IsMongoId()
