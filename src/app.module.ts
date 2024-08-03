@@ -21,6 +21,7 @@ import { FixturesService } from './seedCommand/fixtures.service';
 import { SeedCommandService } from './seedCommand/seed.command.service';
 import { CalculatorService } from './calculator/calculator.service';
 import { JwtModule } from '@nestjs/jwt';
+import { TeamsModule } from './teams/teams.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { JwtModule } from '@nestjs/jwt';
       secret: process.env.SECRET_KEY || 'secret_KEY',
       signOptions: { expiresIn: '24h' },
     }),
+    TeamsModule,
   ],
   controllers: [
     AppController,
