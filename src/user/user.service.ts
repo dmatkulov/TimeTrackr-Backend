@@ -10,6 +10,7 @@ import { User, UserDocument } from './shema/user.schema';
 import mongoose, { FilterQuery, Model, mongo, Types } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Role } from '../utils/enums/role.enum';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -26,7 +27,9 @@ export class UserService {
         firstname: createUserDto.firstname,
         lastname: createUserDto.lastname,
         photo: file ? '/uploads/' + file.filename : null,
-        phoneNumber: createUserDto.phoneNumber,
+        // phoneNumber: createUserDto.phoneNumber
+        //   ? createUserDto.phoneNumber
+        //   : 996220222222,
         position: createUserDto.position,
         roles: createUserDto.role,
       });
@@ -118,7 +121,7 @@ export class UserService {
   async updateOne(
     id: Types.ObjectId,
     file: Express.Multer.File,
-    dto: CreateUserDto,
+    dto: UpdateUserDto,
     currentUser: UserDocument,
   ) {
     const isAdmin = currentUser.role === Role.Admin;
@@ -149,7 +152,6 @@ export class UserService {
         photo: image,
         phoneNumber: dto.phoneNumber,
         position: dto.position,
-        roles: dto.role,
       };
 
       if (isEmployee && existingUser._id.equals(currentUser._id)) {

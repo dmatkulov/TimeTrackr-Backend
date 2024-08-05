@@ -16,7 +16,7 @@ import {
 import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import path from 'path';
+import * as path from 'path';
 import { randomUUID } from 'crypto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetUser } from '../utils/decorators/get-user.decorator';
@@ -27,8 +27,9 @@ import { JWTGuard } from '../utils/guards/token.guard';
 import { RolesGuard } from '../utils/guards/roles.guard';
 import { ParseObjectIdPipe } from 'nestjs-object-id';
 import { Types } from 'mongoose';
+import { UpdateUserDto } from './dto/update-user.dto';
 
-@Controller('user')
+@Controller('staff')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -64,7 +65,6 @@ export class UserController {
     return this.userService.getAll(positions, email, lastname);
   }
 
-  @Roles(Role.Admin)
   @UseGuards(JWTGuard, RolesGuard)
   @Get('info/:id')
   getOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
@@ -90,7 +90,7 @@ export class UserController {
   updateOne(
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
     @UploadedFile() file: Express.Multer.File,
-    @Body() dto: CreateUserDto,
+    @Body() dto: UpdateUserDto,
     @GetUser() user: UserDocument,
   ) {
     return this.userService.updateOne(id, file, dto, user);
