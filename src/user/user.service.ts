@@ -136,6 +136,7 @@ export class UserService {
     try {
       let user: UserDocument;
       let image: string | undefined | null;
+      let phone: string | undefined | null;
 
       if (dto.photo === 'delete') {
         image = null;
@@ -145,12 +146,18 @@ export class UserService {
         image = dto.photo;
       }
 
+      if (dto.phoneNumber === 'delete') {
+        phone = null;
+      } else {
+        phone = dto.phoneNumber;
+      }
+
       const update = {
         email: dto.email,
         firstname: dto.firstname,
         lastname: dto.lastname,
         photo: image,
-        phoneNumber: dto.phoneNumber,
+        phoneNumber: phone,
         position: dto.position,
       };
 
