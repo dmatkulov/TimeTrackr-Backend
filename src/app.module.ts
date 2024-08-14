@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './user/shema/user.schema';
 import { PassportModule } from '@nestjs/passport';
 import { RolesGuard } from './utils/guards/roles.guard';
-import { LocalStrategy } from './auth/local.strategy';
+import { LocalStrategy } from './strategies/local.strategy';
 import { CommandModule } from 'nestjs-command';
 import { Position, PositionSchema } from './schemas/position.schema';
 import { PositionsService } from './position/positions.service';

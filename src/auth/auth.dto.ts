@@ -1,16 +1,8 @@
-import {
-  IsEmail,
-  IsEnum,
-  IsMongoId,
-  IsNotEmpty,
-  IsOptional,
-  IsPhoneNumber,
-  IsString,
-} from 'class-validator';
-import { Role } from '../../utils/enums/role.enum';
+import { IsEmail, IsEnum, IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Role } from '../utils/enums/role.enum';
 import mongoose from 'mongoose';
 
-export class CreateUserDto {
+export class AuthDto {
   @IsEmail({}, { message: 'Неверный формат почты' })
   @IsNotEmpty()
   email: string;
@@ -25,13 +17,6 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   lastname: string;
-
-  @IsOptional()
-  photo: string;
-
-  @IsOptional()
-  @IsPhoneNumber('KG', { message: 'Неверный формат номера телефона' })
-  phoneNumber: string;
 
   @IsNotEmpty()
   @IsMongoId()

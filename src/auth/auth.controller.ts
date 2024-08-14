@@ -1,17 +1,34 @@
-import { Controller, Delete, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Post,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../utils/decorators/get-user.decorator';
 import { UserDocument } from '../user/shema/user.schema';
 import { Request } from 'express';
 import { JWTGuard } from '../utils/guards/token.guard';
+import { AuthDto } from './auth.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @UsePipes(new ValidationPipe())
+  @Post('register')
+  register(@UploadedFile() file: Express.Multer.File, @Body() dto: AuthDto) {
+    return this.authService.register(file, dto);
+  }
+
   @UseGuards(AuthGuard('local'))
-  @Post('sessions')
+  @Post('login')
   login(@GetUser() user: UserDocument) {
     return this.authService.login(user);
   }
@@ -22,7 +39,7 @@ export class AuthController {
   }
 
   @UseGuards(JWTGuard)
-  @Delete('sessions')
+  @Delete('logout')
   logOut(@Req() req: Request) {
     return this.authService.logOut(req);
   }

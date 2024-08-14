@@ -7,8 +7,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 
 import { User, UserDocument } from './shema/user.schema';
-import mongoose, { FilterQuery, Model, mongo, Types } from 'mongoose';
-import { CreateUserDto } from './dto/create-user.dto';
+import mongoose, { FilterQuery, Model, Types } from 'mongoose';
 import { Role } from '../utils/enums/role.enum';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdatePhotoDto } from './dto/update-photo.dto';
@@ -19,52 +18,6 @@ export class UserService {
     @InjectModel(User.name)
     private userModel: Model<UserDocument>,
   ) {}
-
-  async createOne(file: Express.Multer.File, createUserDto: CreateUserDto) {
-    try {
-      const newUser = new this.userModel({
-        email: createUserDto.email,
-        password: createUserDto.password,
-        firstname: createUserDto.firstname,
-        lastname: createUserDto.lastname,
-        photo: file ? '/uploads/' + file.filename : null,
-        // phoneNumber: createUserDto.phoneNumber
-        //   ? createUserDto.phoneNumber
-        //   : 996220222222,
-        position: createUserDto.position,
-        roles: createUserDto.role,
-      });
-
-      newUser.generateToken();
-
-      await newUser.save();
-
-      const user = await this.userModel
-        .findById(newUser._id)
-        .populate('position');
-      return { message: 'Регистрация прошла успешно', user };
-    } catch (e) {
-      if (e instanceof mongoose.Error.ValidationError) {
-        throw new UnprocessableEntityException(e);
-      }
-
-      if (e instanceof mongo.MongoServerError && e.code === 11000) {
-        const error = {
-          message: [
-            {
-              property: 'email',
-              message: 'Такая почта уже была зарегистрирована',
-            },
-          ],
-          error: 'Unprocessable Entity',
-          statusCode: 422,
-        };
-        throw new UnprocessableEntityException(error);
-      }
-
-      throw e;
-    }
-  }
 
   async getAll(positions: string, email: string, lastname: string) {
     let filter: FilterQuery<UserDocument>;
