@@ -11,6 +11,7 @@ import mongoose, { FilterQuery, Model, mongo, Types } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Role } from '../utils/enums/role.enum';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdatePhotoDto } from './dto/update-photo.dto';
 
 @Injectable()
 export class UserService {
@@ -184,6 +185,64 @@ export class UserService {
       await user.save();
 
       return { message: 'Данные успешно обновлены', user };
+    } catch (e) {
+      if (e instanceof mongoose.Error.ValidationError) {
+        throw new UnprocessableEntityException(e);
+      }
+
+      throw e;
+    }
+  }
+
+  async updatePhoto(
+    id: Types.ObjectId,
+    file: Express.Multer.File,
+    dto: UpdatePhotoDto,
+    currentUser: UserDocument,
+  ) {
+    const isUser = currentUser.role === Role.User;
+
+    const existingUser = await this.userModel.findById(id);
+
+    if (!existingUser) {
+      throw new NotFoundException({ message: 'Пользователь не найден!' });
+    }
+
+    try {
+      let user: UserDocument;
+      let image: string | undefined | null;
+
+      if (dto.photo === 'delete') {
+        image = null;
+      } else if (file) {
+        image = '/uploads/' + file.filename;
+      } else {
+        image = dto.photo;
+      }
+
+      const update = {
+        photo: image,
+      };
+
+      if (isUser && existingUser._id.equals(currentUser._id)) {
+        user = await this.userModel
+          .findOneAndUpdate(
+            { _id: currentUser._id },
+            { $set: update },
+            { new: true },
+          )
+          .populate('position');
+      } else {
+        return new UnauthorizedException({
+          message: 'Вы не сможете вносить изменения',
+        });
+      }
+
+      user.generateToken();
+
+      await user.save();
+
+      return { message: 'Фото успешно обновлено', user };
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
         throw new UnprocessableEntityException(e);

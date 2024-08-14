@@ -28,6 +28,7 @@ import { RolesGuard } from '../utils/guards/roles.guard';
 import { ParseObjectIdPipe } from 'nestjs-object-id';
 import { Types } from 'mongoose';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdatePhotoDto } from './dto/update-photo.dto';
 
 @Controller('staff')
 export class UserController {
@@ -94,6 +95,30 @@ export class UserController {
     @GetUser() user: UserDocument,
   ) {
     return this.userService.updateOne(id, file, dto, user);
+  }
+
+  @Roles(Role.Admin, Role.User)
+  @UseGuards(JWTGuard, RolesGuard)
+  @Patch('photo/edit/:id')
+  @UseInterceptors(
+    FileInterceptor('photo', {
+      storage: diskStorage({
+        destination: './public/uploads/',
+        filename: (_req, file, cb) => {
+          const extension = path.extname(file.originalname);
+          const filename = path.join('staff', randomUUID() + extension);
+          cb(null, filename);
+        },
+      }),
+    }),
+  )
+  updatePhoto(
+    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: UpdatePhotoDto,
+    @GetUser() user: UserDocument,
+  ) {
+    return this.userService.updatePhoto(id, file, dto, user);
   }
 
   @Roles(Role.Admin)
