@@ -1,15 +1,10 @@
 import {
   IsEmail,
-  IsEnum,
   IsMongoId,
   IsNotEmpty,
   IsOptional,
   IsString,
-  ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
-import { GetContactInfoDto } from './get-contactInfo.dto';
-import { Role } from '../enums/role.enum';
 import mongoose from 'mongoose';
 
 export class UpdateUserDto {
@@ -28,15 +23,10 @@ export class UpdateUserDto {
   @IsOptional()
   photo: string;
 
-  @ValidateNested({ each: true })
-  @Type(() => GetContactInfoDto)
-  contactInfo: GetContactInfoDto;
+  @IsOptional()
+  phoneNumber: string;
 
   @IsNotEmpty()
   @IsMongoId()
   position: mongoose.Schema.Types.ObjectId;
-
-  @IsOptional()
-  @IsEnum(Role)
-  role: Role;
 }

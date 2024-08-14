@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -7,25 +6,18 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { User, UserDocument } from '../schemas/user.schema';
+import { User, UserDocument } from './shema/user.schema';
 import mongoose, { FilterQuery, Model, mongo, Types } from 'mongoose';
-import { CreateUserDto } from '../dto/create-user.dto';
-import { Request } from 'express';
-import { Role } from '../enums/role.enum';
-import { UpdateUserDto } from '../dto/update-user.dto';
-import { OAuth2Client } from 'google-auth-library';
-import { randomUUID } from 'crypto';
-import { Position, PositionDocument } from '../schemas/position.schema';
-
-const client = new OAuth2Client(process.env['GOOGLE_CLIENT_ID']);
+import { CreateUserDto } from './dto/create-user.dto';
+import { Role } from '../utils/enums/role.enum';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdatePhotoDto } from './dto/update-photo.dto';
 
 @Injectable()
-export class UsersService {
+export class UserService {
   constructor(
     @InjectModel(User.name)
     private userModel: Model<UserDocument>,
-    @InjectModel(Position.name)
-    private positionModel: Model<PositionDocument>,
   ) {}
 
   async createOne(file: Express.Multer.File, createUserDto: CreateUserDto) {
@@ -36,7 +28,9 @@ export class UsersService {
         firstname: createUserDto.firstname,
         lastname: createUserDto.lastname,
         photo: file ? '/uploads/' + file.filename : null,
-        contactInfo: createUserDto.contactInfo,
+        // phoneNumber: createUserDto.phoneNumber
+        //   ? createUserDto.phoneNumber
+        //   : 996220222222,
         position: createUserDto.position,
         roles: createUserDto.role,
       });
@@ -70,92 +64,6 @@ export class UsersService {
 
       throw e;
     }
-  }
-
-  async login(activeUser: UserDocument) {
-    const user = await this.userModel
-      .findById(activeUser._id)
-      .populate('position');
-    return { message: `С возвращением, ${user.firstname}!`, user };
-  }
-
-  async google(req: Request) {
-    const ticket = await client.verifyIdToken({
-      idToken: req.body.credential,
-      audience: process.env['GOOGLE_CLIENT_ID'],
-    });
-
-    const payload = ticket.getPayload();
-
-    if (!payload) {
-      throw new BadRequestException('Google login error!');
-    }
-
-    const id = payload['sub'];
-    const email = payload['email'];
-    const firstname = payload['given_name'];
-    const lastname = payload['family_name'];
-    const photo = payload['picture'];
-    const position = await this.positionModel.findOne({ name: 'Не назначено' });
-
-    if (!email) {
-      throw new BadRequestException('Email is not present!');
-    }
-
-    let googleUser = await this.userModel.findOne({ googleID: id });
-
-    let message: string;
-    if (!googleUser) {
-      googleUser = new this.userModel({
-        email,
-        firstname,
-        lastname,
-        position,
-        photo,
-        password: randomUUID(),
-        googleID: id,
-        isGoogleUser: true,
-      });
-
-      message = `Привет, ${googleUser.firstname}`;
-    } else {
-      message = `С возвращением, ${googleUser.firstname}!`;
-    }
-
-    googleUser.generateToken();
-    await googleUser.save();
-
-    const user = await this.userModel
-      .findOne({ googleID: id })
-      .populate('position');
-
-    return { message, user };
-  }
-
-  async logOut(req: Request) {
-    const headerValue = req.get('Authorization');
-    const successMessage = { message: 'Пользователь вышел из системы' };
-
-    if (!headerValue) {
-      return successMessage;
-    }
-
-    const [_bearer, token] = headerValue.split(' ');
-
-    if (!token) {
-      return successMessage;
-    }
-
-    const user = await this.userModel.findOne({ token });
-
-    if (!user) {
-      return successMessage;
-    }
-
-    user.generateToken();
-    await user.save();
-
-    return successMessage;
   }
 
   async getAll(positions: string, email: string, lastname: string) {
@@ -205,7 +113,7 @@ export class UsersService {
     const user = await this.userModel.findById(id).populate('position');
 
     if (!user) {
-      throw new NotFoundException({ message: 'Сотрудник не найден!' });
+      throw new NotFoundException({ message: 'Пользователь не найден!' });
     }
 
     return user;
@@ -218,17 +126,18 @@ export class UsersService {
     currentUser: UserDocument,
   ) {
     const isAdmin = currentUser.role === Role.Admin;
-    const isEmployee = currentUser.role === Role.Employee;
+    const isEmployee = currentUser.role === Role.User;
 
     const existingUser = await this.userModel.findById(id);
 
     if (!existingUser) {
-      throw new NotFoundException({ message: 'Сотрудник не найден!' });
+      throw new NotFoundException({ message: 'Пользователь не найден!' });
     }
 
     try {
       let user: UserDocument;
       let image: string | undefined | null;
+      let phone: string | undefined | null;
 
       if (dto.photo === 'delete') {
         image = null;
@@ -238,14 +147,19 @@ export class UsersService {
         image = dto.photo;
       }
 
+      if (dto.phoneNumber === 'delete') {
+        phone = null;
+      } else {
+        phone = dto.phoneNumber;
+      }
+
       const update = {
         email: dto.email,
         firstname: dto.firstname,
         lastname: dto.lastname,
         photo: image,
-        contactInfo: dto.contactInfo,
+        phoneNumber: phone,
         position: dto.position,
-        roles: dto.role,
       };
 
       if (isEmployee && existingUser._id.equals(currentUser._id)) {
@@ -280,14 +194,72 @@ export class UsersService {
     }
   }
 
+  async updatePhoto(
+    id: Types.ObjectId,
+    file: Express.Multer.File,
+    dto: UpdatePhotoDto,
+    currentUser: UserDocument,
+  ) {
+    const isUser = currentUser.role === Role.User;
+
+    const existingUser = await this.userModel.findById(id);
+
+    if (!existingUser) {
+      throw new NotFoundException({ message: 'Пользователь не найден!' });
+    }
+
+    try {
+      let user: UserDocument;
+      let image: string | undefined | null;
+
+      if (dto.photo === 'delete') {
+        image = null;
+      } else if (file) {
+        image = '/uploads/' + file.filename;
+      } else {
+        image = dto.photo;
+      }
+
+      const update = {
+        photo: image,
+      };
+
+      if (isUser && existingUser._id.equals(currentUser._id)) {
+        user = await this.userModel
+          .findOneAndUpdate(
+            { _id: currentUser._id },
+            { $set: update },
+            { new: true },
+          )
+          .populate('position');
+      } else {
+        return new UnauthorizedException({
+          message: 'Вы не сможете вносить изменения',
+        });
+      }
+
+      user.generateToken();
+
+      await user.save();
+
+      return { message: 'Фото успешно обновлено', user };
+    } catch (e) {
+      if (e instanceof mongoose.Error.ValidationError) {
+        throw new UnprocessableEntityException(e);
+      }
+
+      throw e;
+    }
+  }
+
   async deleteOne(id: Types.ObjectId) {
     const user = await this.userModel.findById(id);
 
     if (!user) {
-      throw new NotFoundException({ message: 'Сотрудник не найден!' });
+      throw new NotFoundException({ message: 'Пользователь не найден!' });
     }
 
     await this.userModel.findOneAndDelete(id);
-    return { message: 'Сотрудник был удален!' };
+    return { message: 'Пользователь был удален!' };
   }
 }

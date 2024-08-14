@@ -11,10 +11,10 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { PositionsService } from './positions.service';
-import { Roles } from '../decorators/roles.decorator';
-import { Role } from '../enums/role.enum';
-import { RolesGuard } from '../auth/roles.guard';
-import { JWTGuard } from '../auth/token.guard';
+import { Roles } from '../utils/decorators/roles.decorator';
+import { Role } from '../utils/enums/role.enum';
+import { RolesGuard } from '../utils/guards/roles.guard';
+import { JWTGuard } from '../utils/guards/token.guard';
 import { CreatePositionDto } from '../dto/create-position.dto';
 import { ParseObjectIdPipe } from 'nestjs-object-id';
 import { Types } from 'mongoose';

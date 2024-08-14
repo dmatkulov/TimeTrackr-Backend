@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Position } from '../schemas/position.schema';
 import { Model } from 'mongoose';
-import { User, UserDocument } from '../schemas/user.schema';
-import { Role } from '../enums/role.enum';
-import { TaskLabel } from '../enums/task-label.enum';
-import { Task, TaskDocument } from '../schemas/task.schema';
+import { User, UserDocument } from '../user/shema/user.schema';
+import { Role } from '../utils/enums/role.enum';
+import { TaskLabel } from '../utils/enums/task-label.enum';
+import { Task, TaskDocument } from '../task/shema/task.schema';
 
 @Injectable()
 export class FixturesService {
@@ -43,11 +43,7 @@ export class FixturesService {
         password: 'qwerty12',
         firstname: 'Дильшад',
         lastname: 'Mаткулов',
-        contactInfo: {
-          mobile: '996220965222',
-          city: 'Джалалабад',
-          street: 'ул. Гагарина',
-        },
+        phoneNumber: '996220965222',
         photo: 'fixtures/avatars/dilshad.jpg',
         position: positions[0]._id,
         role: Role.Admin,
@@ -58,14 +54,10 @@ export class FixturesService {
         password: 'qwerty12',
         firstname: 'Назгул',
         lastname: 'Доолоткелдиева',
-        contactInfo: {
-          mobile: '996220965223',
-          city: 'Бишкек',
-          street: 'Турусбекова',
-        },
+        phoneNumber: '996220965222',
         photo: 'fixtures/avatars/nazgul.jpg',
         position: positions[1]._id,
-        role: Role.Employee,
+        role: Role.User,
         startDate: '2020-04-27T12:00:00.000+00:00',
       },
       {
@@ -73,14 +65,10 @@ export class FixturesService {
         password: 'qwerty12',
         firstname: 'Максим',
         lastname: 'Иванов',
-        contactInfo: {
-          mobile: '996220965225',
-          city: 'Москва',
-          street: 'Пушкина',
-        },
+        phoneNumber: '996220965222',
         photo: 'fixtures/avatars/maxim.jpg',
         position: positions[2]._id,
-        role: Role.Employee,
+        role: Role.User,
         startDate: '2020-04-27T12:00:00.000+00:00',
       },
       {
@@ -88,14 +76,10 @@ export class FixturesService {
         password: 'qwerty12',
         firstname: 'Айжамал',
         lastname: 'Борисова',
-        contactInfo: {
-          mobile: '996220965226',
-          city: 'Бишкек',
-          street: 'Конгантиева',
-        },
+        phoneNumber: '996220965222',
         photo: 'fixtures/avatars/jamal.jpg',
         position: positions[3]._id,
-        role: Role.Employee,
+        role: Role.User,
         startDate: '2020-01-27T12:00:00.000+00:00',
       },
       {
@@ -103,14 +87,10 @@ export class FixturesService {
         password: 'qwerty12',
         firstname: 'John',
         lastname: 'Doe',
-        contactInfo: {
-          mobile: '996220965227',
-          city: 'Бишкек',
-          street: 'Конгантиева',
-        },
+        phoneNumber: '996220965222',
         photo: 'fixtures/avatars/john.jpg',
         position: positions[3]._id,
-        role: Role.Employee,
+        role: Role.User,
         startDate: '2020-01-27T12:00:00.000+00:00',
       },
       {
@@ -118,14 +98,10 @@ export class FixturesService {
         password: 'qwerty12',
         firstname: 'Бектур',
         lastname: 'Исмаилов',
-        contactInfo: {
-          mobile: '996220965227',
-          city: 'Бишкек',
-          street: 'Медерова',
-        },
+        phoneNumber: '996220965222',
         photo: 'fixtures/avatars/bektur.jpg',
         position: positions[4]._id,
-        role: Role.Employee,
+        role: Role.User,
         startDate: '2024-01-27T12:00:00.000+00:00',
       },
     ];

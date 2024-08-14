@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { User } from './user.schema';
+import { User } from '../../user/shema/user.schema';
 import mongoose, { Document } from 'mongoose';
 import { GetTaskInfoDto } from '../dto/get-taskInfo.dto';
 import { Type } from 'class-transformer';

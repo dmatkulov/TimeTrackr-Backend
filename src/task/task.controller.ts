@@ -11,23 +11,23 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { RolesGuard } from '../auth/roles.guard';
-import { JWTGuard } from '../auth/token.guard';
-import { TasksService } from './tasks.service';
-import { GetUser } from '../decorators/get-user.decorator';
-import { UserDocument } from '../schemas/user.schema';
-import { CreateTaskDto } from '../dto/create-task.dto';
-import { Roles } from '../decorators/roles.decorator';
-import { Role } from '../enums/role.enum';
+import { RolesGuard } from '../utils/guards/roles.guard';
+import { JWTGuard } from '../utils/guards/token.guard';
+import { TaskService } from './task.service';
+import { GetUser } from '../utils/decorators/get-user.decorator';
+import { UserDocument } from '../user/shema/user.schema';
+import { CreateTaskDto } from './dto/create-task.dto';
+import { Roles } from '../utils/decorators/roles.decorator';
+import { Role } from '../utils/enums/role.enum';
 import { ParseObjectIdPipe } from 'nestjs-object-id';
 import { Types } from 'mongoose';
-import { GetTaskInfoDto } from '../dto/get-taskInfo.dto';
+import { GetTaskInfoDto } from './dto/get-taskInfo.dto';
 
 @Controller('tasks')
-export class TasksController {
-  constructor(private readonly tasksService: TasksService) {}
+export class TaskController {
+  constructor(private readonly tasksService: TaskService) {}
 
-  @Roles(Role.Employee)
+  @Roles(Role.User)
   @UseGuards(JWTGuard, RolesGuard)
   @UsePipes(new ValidationPipe())
   @Post('new-task')
@@ -55,7 +55,7 @@ export class TasksController {
     return this.tasksService.getOne(user, id, taskId);
   }
 
-  @Roles(Role.Employee)
+  @Roles(Role.User)
   @UseGuards(JWTGuard, RolesGuard)
   @UsePipes(new ValidationPipe())
   @Patch('edit/:id')
@@ -68,7 +68,7 @@ export class TasksController {
     return this.tasksService.updateOne(id, user, dto, taskId);
   }
 
-  @Roles(Role.Employee, Role.Admin)
+  @Roles(Role.User, Role.Admin)
   @UseGuards(JWTGuard, RolesGuard)
   @Delete('delete/:id')
   deleteOne(

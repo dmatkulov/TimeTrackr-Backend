@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { TaskLabel } from '../enums/task-label.enum';
+import { TaskLabel } from '../../utils/enums/task-label.enum';
 
 export class GetTaskInfoDto {
   _id: string;
