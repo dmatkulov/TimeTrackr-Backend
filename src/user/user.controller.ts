@@ -28,7 +28,7 @@ import { Types } from 'mongoose';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdatePhotoDto } from './dto/update-photo.dto';
 
-@Controller('staff')
+@Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
