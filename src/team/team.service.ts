@@ -1,6 +1,6 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model, Types } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { Team, TeamDocument } from './schema/team.schema';
 import { CreateTeamDto } from './create-team.dto';
 import { User, UserDocument } from '../user/shema/user.schema';
@@ -30,7 +30,7 @@ export class TeamService {
         (memberId) => new mongoose.Types.ObjectId(memberId),
       );
 
-      if (!members.includes(new Types.ObjectId(user._id))) {
+      if (!members.includes(user._id)) {
         members.push(user._id);
       }
 
