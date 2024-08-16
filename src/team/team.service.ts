@@ -2,7 +2,7 @@ import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { Team, TeamDocument } from './schema/team.schema';
-import { CreateTeamDto } from './create-team.dto';
+import { CreateTeamDto } from './dto/create-team.dto';
 import { User, UserDocument } from '../user/shema/user.schema';
 import { Role } from '../utils/enums/role.enum';
 
@@ -26,18 +26,11 @@ export class TeamService {
     }
 
     try {
-      const members = dto.members.map(
-        (memberId) => new mongoose.Types.ObjectId(memberId),
-      );
-
-      if (!members.includes(user._id)) {
-        members.push(user._id);
-      }
-
       const newTeam = await this.teamModel.create({
         name: dto.name,
         description: dto.description,
-        members,
+        teamLead: user._id,
+        members: dto.members,
       });
 
       return await newTeam.save();
