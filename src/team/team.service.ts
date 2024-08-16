@@ -1,7 +1,7 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
-import { Team } from './schema/team.schema';
+import { Team, TeamDocument } from './schema/team.schema';
 import { CreateTeamDto } from './create-team.dto';
 import { User, UserDocument } from '../user/shema/user.schema';
 import { Role } from '../utils/enums/role.enum';
@@ -9,7 +9,7 @@ import { Role } from '../utils/enums/role.enum';
 @Injectable()
 export class TeamService {
   @InjectModel(Team.name)
-  private teamModel: Model<Team>;
+  private teamModel: Model<TeamDocument>;
 
   @InjectModel(User.name)
   private userModel: Model<UserDocument>;

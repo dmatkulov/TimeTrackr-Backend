@@ -52,7 +52,7 @@ export class User {
     required: true,
     default: Role.User,
   })
-  role: Role[];
+  roles: Role[];
 
   @Prop({ required: false, type: String })
   googleID?: string;

@@ -78,8 +78,8 @@ export class UserService {
     dto: UpdateUserDto,
     currentUser: UserDocument,
   ) {
-    const isAdmin = currentUser.role.includes(Role.Admin);
-    const isEmployee = currentUser.role.includes(Role.User);
+    const isAdmin = currentUser.roles.includes(Role.Admin);
+    const isEmployee = currentUser.roles.includes(Role.User);
 
     const existingUser = await this.userModel.findById(id);
 
@@ -153,7 +153,7 @@ export class UserService {
     dto: UpdatePhotoDto,
     currentUser: UserDocument,
   ) {
-    const isUser = currentUser.role.includes(Role.User);
+    const isUser = currentUser.roles.includes(Role.User);
 
     const existingUser = await this.userModel.findById(id);
 

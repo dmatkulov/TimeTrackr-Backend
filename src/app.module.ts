@@ -24,6 +24,7 @@ import { TeamController } from './team/team.controller';
 import { TeamService } from './team/team.service';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
+import { Team, TeamSchema } from './team/schema/team.schema';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { AuthService } from './auth/auth.service';
       { name: Position.name, schema: PositionSchema },
     ]),
     MongooseModule.forFeature([{ name: Task.name, schema: TaskSchema }]),
+    MongooseModule.forFeature([{ name: Team.name, schema: TeamSchema }]),
     PassportModule,
     CommandModule,
     JwtModule.register({
@@ -45,8 +47,8 @@ import { AuthService } from './auth/auth.service';
 
     UserController,
     AuthController,
-
     TeamController,
+
     PositionsController,
     TaskController,
   ],
