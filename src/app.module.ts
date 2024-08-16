@@ -7,7 +7,7 @@ import { PassportModule } from '@nestjs/passport';
 import { RolesGuard } from './utils/guards/roles.guard';
 import { LocalStrategy } from './strategies/local.strategy';
 import { CommandModule } from 'nestjs-command';
-import { Position, PositionSchema } from './schemas/position.schema';
+import { Position, PositionSchema } from './position/schema/position.schema';
 import { PositionsService } from './position/positions.service';
 import { PositionsController } from './position/positions.controller';
 import { Task, TaskSchema } from './task/shema/task.schema';

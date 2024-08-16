@@ -1,11 +1,13 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty } from 'class-validator';
+import { PositionEnum } from '../../utils/enums/position.enum';
+import { TagEnum } from '../../utils/enums/tag.enum';
 
 export class CreatePositionDto {
-  @IsString()
   @IsNotEmpty()
-  name: string;
+  @IsEnum(PositionEnum)
+  name: PositionEnum;
 
-  @IsString()
   @IsNotEmpty()
-  tag: string;
+  @IsEnum(TagEnum)
+  tag: TagEnum;
 }

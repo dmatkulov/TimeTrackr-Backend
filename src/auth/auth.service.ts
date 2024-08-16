@@ -10,7 +10,7 @@ import mongoose, { Model, mongo } from 'mongoose';
 import { Request } from 'express';
 import { randomUUID } from 'crypto';
 import { OAuth2Client } from 'google-auth-library';
-import { Position, PositionDocument } from '../schemas/position.schema';
+import { Position, PositionDocument } from '../position/schema/position.schema';
 import { AuthDto } from './auth.dto';
 
 const client = new OAuth2Client(process.env['GOOGLE_CLIENT_ID']);
@@ -51,7 +51,6 @@ export class AuthService {
         password: createUserDto.password,
         firstname: createUserDto.firstname,
         lastname: createUserDto.lastname,
-        position: createUserDto.position,
         roles: createUserDto.role,
       });
 
@@ -110,7 +109,6 @@ export class AuthService {
     const firstname = payload['given_name'];
     const lastname = payload['family_name'];
     const photo = payload['picture'];
-    const position = await this.positionModel.findOne({ name: 'Не назначено' });
 
     if (!email) {
       throw new BadRequestException('Email is not present!');
@@ -124,7 +122,6 @@ export class AuthService {
         email,
         firstname,
         lastname,
-        position,
         photo,
         password: randomUUID(),
         googleID: id,

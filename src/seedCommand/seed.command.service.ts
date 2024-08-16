@@ -23,6 +23,7 @@ export class SeedCommandService {
       await this.dropCollection(db, collectionsName);
     }
 
+    await this.fixturesService.seedPositions();
     await this.fixturesService.seedUsers();
 
     await this.closeConnection(db);

@@ -5,7 +5,15 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import mongoose from 'mongoose';
 
+class TeamStaff {
+  @IsNotEmpty()
+  @IsMongoId()
+  user: mongoose.Schema.Types.ObjectId;
+
+  position;
+}
 export class CreateTeamDto {
   @IsString()
   @IsNotEmpty()

@@ -1,13 +1,11 @@
 import {
   IsEmail,
   IsEnum,
-  IsMongoId,
   IsNotEmpty,
   IsOptional,
   IsString,
 } from 'class-validator';
 import { Role } from '../utils/enums/role.enum';
-import mongoose from 'mongoose';
 
 export class AuthDto {
   @IsEmail({}, { message: 'Неверный формат почты' })
@@ -24,10 +22,6 @@ export class AuthDto {
   @IsString()
   @IsNotEmpty()
   lastname: string;
-
-  @IsNotEmpty()
-  @IsMongoId()
-  position: mongoose.Schema.Types.ObjectId;
 
   @IsOptional()
   @IsEnum(Role)

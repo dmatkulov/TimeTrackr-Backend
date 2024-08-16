@@ -3,7 +3,7 @@ import { compare, genSalt, hash } from 'bcrypt';
 import mongoose, { Document } from 'mongoose';
 import * as jwt from 'jsonwebtoken';
 import { Role } from '../../utils/enums/role.enum';
-import { Position } from '../../schemas/position.schema';
+import { Position } from '../../position/schema/position.schema';
 
 const SALT_WORK_FACTOR = 10;
 const JWT_SECRET = process.env.SECRET_KEY || 'secret_KEY';

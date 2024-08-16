@@ -112,7 +112,6 @@ export class UserService {
         lastname: dto.lastname,
         photo: image,
         phoneNumber: phone,
-        position: dto.position,
       };
 
       if (isEmployee && existingUser._id.equals(currentUser._id)) {

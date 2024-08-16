@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model, mongo, Types } from 'mongoose';
-import { Position, PositionDocument } from '../schemas/position.schema';
+import { Position, PositionDocument } from './schema/position.schema';
 import { CreatePositionDto } from './dto/create-position.dto';
 
 @Injectable()
