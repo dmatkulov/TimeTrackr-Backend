@@ -20,7 +20,7 @@ import { CalculatorService } from './calculator/calculator.service';
 import { JwtModule } from '@nestjs/jwt';
 import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
-import { TeamController } from './team/dto/team.controller';
+import { TeamController } from './team/team.controller';
 import { TeamService } from './team/team.service';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';

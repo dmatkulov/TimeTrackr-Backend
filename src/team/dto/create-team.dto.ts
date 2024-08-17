@@ -4,7 +4,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { TeamMembersDto } from '../team-members.dto';
+import { TeamMembersDto } from './team-members.dto';
 import { Type } from 'class-transformer';
 
 export class CreateTeamDto {

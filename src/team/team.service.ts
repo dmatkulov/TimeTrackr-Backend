@@ -1,6 +1,10 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import mongoose, { Model, mongo } from 'mongoose';
 import { Team, TeamDocument } from './schema/team.schema';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { User, UserDocument } from '../user/shema/user.schema';
@@ -35,6 +39,10 @@ export class TeamService {
 
       return await newTeam.save();
     } catch (e) {
+      if (e instanceof mongo.MongoServerError && e.code === 11000) {
+        throw new BadRequestException('Введите уникальное название команды');
+      }
+
       if (e instanceof mongoose.Error.ValidationError) {
         throw new UnprocessableEntityException(e);
       }

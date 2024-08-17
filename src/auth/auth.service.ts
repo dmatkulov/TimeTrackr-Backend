@@ -58,9 +58,7 @@ export class AuthService {
 
       await newUser.save();
 
-      const user = await this.userModel
-        .findById(newUser._id)
-        .populate('position');
+      const user = await this.userModel.findById(newUser._id);
       return { message: 'Регистрация прошла успешно', user };
     } catch (e) {
       if (e instanceof mongoose.Error.ValidationError) {
@@ -86,9 +84,7 @@ export class AuthService {
   }
 
   async login(activeUser: UserDocument) {
-    const user = await this.userModel
-      .findById(activeUser._id)
-      .populate('position');
+    const user = await this.userModel.findById(activeUser._id);
     return { message: `С возвращением, ${user.firstname}!`, user };
   }
 
@@ -136,9 +132,7 @@ export class AuthService {
     googleUser.generateToken();
     await googleUser.save();
 
-    const user = await this.userModel
-      .findOne({ googleID: id })
-      .populate('position');
+    const user = await this.userModel.findOne({ googleID: id });
 
     return { message, user };
   }
