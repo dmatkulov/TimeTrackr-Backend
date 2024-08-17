@@ -40,7 +40,6 @@ export class FixturesService {
         phoneNumber: '996220965222',
         photo: 'fixtures/avatars/dilshad.jpg',
         roles: Role.Admin,
-        startDate: '2018-04-27T12:00:00.000+00:00',
       },
       {
         email: 'manager@gmail.com',
@@ -50,7 +49,15 @@ export class FixturesService {
         phoneNumber: '996220965222',
         photo: 'fixtures/avatars/nazgul.jpg',
         roles: Role.User,
-        startDate: '2020-04-27T12:00:00.000+00:00',
+      },
+      {
+        email: 'frontend@gmail.com',
+        password: 'qwerty12',
+        firstname: 'Максим',
+        lastname: 'Хренов',
+        phoneNumber: '996220965222',
+        photo: 'fixtures/avatars/nazgul.jpg',
+        roles: Role.User,
       },
     ];
 

@@ -13,7 +13,11 @@ export class Team {
   @Prop({ required: false })
   description: string;
 
-  @Prop({ ref: User.name, required: true })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: User.name,
+    required: true,
+  })
   teamLead: mongoose.Schema.Types.ObjectId;
 
   @Prop({
