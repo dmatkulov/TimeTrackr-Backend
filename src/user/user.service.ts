@@ -19,6 +19,10 @@ export class UserService {
     private userModel: Model<UserDocument>,
   ) {}
 
+  async getUsers() {
+    return this.userModel.find();
+  }
+
   async getAll(positions: string, email: string, lastname: string) {
     let filter: FilterQuery<UserDocument>;
 
@@ -50,7 +54,6 @@ export class UserService {
 
     const users: UserDocument[] = await this.userModel
       .find(filter)
-      .populate('position')
       .select('email firstname lastname position photo')
       .sort({ startDate: -1 });
     if (users.length === 0) {
@@ -63,7 +66,7 @@ export class UserService {
   }
 
   async getOne(id: Types.ObjectId) {
-    const user = await this.userModel.findById(id).populate('position');
+    const user = await this.userModel.findById(id);
 
     if (!user) {
       throw new NotFoundException({ message: 'Пользователь не найден!' });
@@ -115,17 +118,17 @@ export class UserService {
       };
 
       if (isEmployee && existingUser._id.equals(currentUser._id)) {
-        user = await this.userModel
-          .findOneAndUpdate(
-            { _id: currentUser._id },
-            { $set: update },
-            { new: true },
-          )
-          .populate('position');
+        user = await this.userModel.findOneAndUpdate(
+          { _id: currentUser._id },
+          { $set: update },
+          { new: true },
+        );
       } else if (isAdmin) {
-        user = await this.userModel
-          .findOneAndUpdate(id, { $set: update }, { new: true })
-          .populate('position');
+        user = await this.userModel.findOneAndUpdate(
+          id,
+          { $set: update },
+          { new: true },
+        );
       } else {
         return new UnauthorizedException({
           message: 'Вы не сможете вносить изменения',
@@ -177,13 +180,11 @@ export class UserService {
       };
 
       if (isUser && existingUser._id.equals(currentUser._id)) {
-        user = await this.userModel
-          .findOneAndUpdate(
-            { _id: currentUser._id },
-            { $set: update },
-            { new: true },
-          )
-          .populate('position');
+        user = await this.userModel.findOneAndUpdate(
+          { _id: currentUser._id },
+          { $set: update },
+          { new: true },
+        );
       } else {
         return new UnauthorizedException({
           message: 'Вы не сможете вносить изменения',

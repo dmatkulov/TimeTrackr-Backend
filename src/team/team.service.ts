@@ -30,14 +30,16 @@ export class TeamService {
     }
 
     try {
-      const newTeam = await this.teamModel.create({
+      const team = await this.teamModel.create({
         name: dto.name,
         description: dto.description,
         teamLead: user._id,
         members: dto.members,
       });
 
-      return await newTeam.save();
+      await team.save();
+
+      return { message: 'Команда создана', team };
     } catch (e) {
       if (e instanceof mongo.MongoServerError && e.code === 11000) {
         throw new BadRequestException('Введите уникальное название команды');

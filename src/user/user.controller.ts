@@ -32,9 +32,13 @@ import { UpdatePhotoDto } from './dto/update-photo.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Roles(Role.Admin)
-  @UseGuards(JWTGuard, RolesGuard)
+  @UseGuards(JWTGuard)
   @Get()
+  getUsers() {
+    return this.userService.getUsers();
+  }
+  @UseGuards(JWTGuard)
+  @Get('filter')
   getAll(
     @Query('positions') positions: string,
     @Query('email') email: string,
