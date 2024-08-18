@@ -74,7 +74,6 @@ export class TeamService {
   }
 
   async toggleFavourite(id: Types.ObjectId, dto: ToggleFavouriteDto) {
-    console.log(dto);
     await this.teamModel.findOneAndUpdate(
       { _id: id },
       { $set: { isFavorite: dto.isFavorite } },
