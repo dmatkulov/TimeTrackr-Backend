@@ -20,22 +20,23 @@ export class Team {
   })
   teamLead: mongoose.Schema.Types.ObjectId;
 
-  @Prop({
-    type: [
-      {
-        user: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: User.name,
-          required: true,
-        },
-        position: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: Position.name,
-          required: true,
-        },
+  @Prop({ type: Boolean, default: false })
+  isSaved: boolean;
+
+  @Prop([
+    {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: User.name,
+        required: true,
       },
-    ],
-  })
+      position: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: Position.name,
+        required: true,
+      },
+    },
+  ])
   @Type(() => CreateTeamDto)
   members: CreateTeamDto[];
 }

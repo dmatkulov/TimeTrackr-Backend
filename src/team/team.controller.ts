@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   UseGuards,
   UsePipes,
@@ -15,9 +16,16 @@ import { GetUser } from '../utils/decorators/get-user.decorator';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UserDocument } from '../user/shema/user.schema';
 
-@Controller('team')
+@Controller('teams')
 export class TeamController {
   constructor(private readonly teamService: TeamService) {}
+
+  @Roles(Role.User)
+  @UseGuards(JWTGuard, RolesGuard)
+  @Get()
+  get(@GetUser() user: UserDocument) {
+    return this.teamService.get(user);
+  }
 
   @Roles(Role.User)
   @UseGuards(JWTGuard, RolesGuard)
