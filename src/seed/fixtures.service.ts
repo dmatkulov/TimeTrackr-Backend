@@ -59,6 +59,42 @@ export class FixturesService {
         photo: 'fixtures/avatars/nazgul.jpg',
         roles: Role.User,
       },
+      {
+        email: 'frontend@gmail.com',
+        password: 'qwerty12',
+        firstname: 'Максим',
+        lastname: 'Иванов',
+        phoneNumber: '996220965222',
+        photo: 'fixtures/avatars/maxim.jpg',
+        role: Role.User,
+      },
+      {
+        email: 'designer@gmail.com',
+        password: 'qwerty12',
+        firstname: 'Айжамал',
+        lastname: 'Борисова',
+        phoneNumber: '996220965222',
+        photo: 'fixtures/avatars/jamal.jpg',
+        role: Role.User,
+      },
+      {
+        email: 'ux-designer@gmail.com',
+        password: 'qwerty12',
+        firstname: 'John',
+        lastname: 'Doe',
+        phoneNumber: '996220965222',
+        photo: 'fixtures/avatars/john.jpg',
+        role: Role.User,
+      },
+      {
+        email: 'backend@gmail.com',
+        password: 'qwerty12',
+        firstname: 'Бектур',
+        lastname: 'Исмаилов',
+        phoneNumber: '996220965222',
+        photo: 'fixtures/avatars/bektur.jpg',
+        role: Role.User,
+      },
     ];
 
     for (const userData of usersData) {

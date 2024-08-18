@@ -21,7 +21,7 @@ export class Team {
   teamLead: mongoose.Schema.Types.ObjectId;
 
   @Prop({ type: Boolean, default: false })
-  isSaved: boolean;
+  isFavorite: boolean;
 
   @Prop([
     {

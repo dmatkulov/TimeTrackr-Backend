@@ -1,11 +1,11 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { FilterQuery, Model, mongo } from 'mongoose';
+import mongoose, { FilterQuery, Model, mongo, Types } from 'mongoose';
 import { Team, TeamDocument } from './schema/team.schema';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { User, UserDocument } from '../user/shema/user.schema';
 import { Role } from '../utils/enums/role.enum';
-import { TaskDocument } from '../task/shema/task.schema';
+import { ToggleFavouriteDto } from './dto/toggle-favourite.dto';
 
 @Injectable()
 export class TeamService {
@@ -63,16 +63,22 @@ export class TeamService {
   async get(user: UserDocument) {
     const userID = user._id;
 
-    let filter: FilterQuery<TaskDocument> = {};
-    const validTeam = await this.teamModel.find({ teamLead: userID });
-
-    if (!validTeam) {
-      filter = { 'members.user': userID };
-    }
+    const filter: FilterQuery<TeamDocument> = {
+      $or: [{ teamLead: userID }, { 'members.user': userID }],
+    };
 
     return this.teamModel
       .find(filter)
-      .select('name isSaved')
-      .sort({ isSaved: -1 });
+      .select('name isFavorite')
+      .sort({ isFavorite: -1 });
+  }
+
+  async toggleFavourite(id: Types.ObjectId, dto: ToggleFavouriteDto) {
+    console.log(dto);
+    await this.teamModel.findOneAndUpdate(
+      { _id: id },
+      { $set: { isFavorite: dto.isFavorite } },
+      { new: true },
+    );
   }
 }

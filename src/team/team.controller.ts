@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  Patch,
   Post,
   UseGuards,
   UsePipes,
@@ -15,6 +17,9 @@ import { JWTGuard } from '../utils/guards/token.guard';
 import { GetUser } from '../utils/decorators/get-user.decorator';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UserDocument } from '../user/shema/user.schema';
+import { ToggleFavouriteDto } from './dto/toggle-favourite.dto';
+import { ParseObjectIdPipe } from 'nestjs-object-id';
+import { Types } from 'mongoose';
 
 @Controller('teams')
 export class TeamController {
@@ -33,5 +38,15 @@ export class TeamController {
   @UsePipes(new ValidationPipe())
   create(@GetUser() user: UserDocument, @Body() dto: CreateTeamDto) {
     return this.teamService.create(user, dto);
+  }
+
+  @Roles(Role.User)
+  @UseGuards(JWTGuard, RolesGuard)
+  @Patch('toogle-favourite/:id')
+  toggle(
+    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+    @Body() dto: ToggleFavouriteDto,
+  ) {
+    return this.teamService.toggleFavourite(id, dto);
   }
 }
