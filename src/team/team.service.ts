@@ -74,7 +74,21 @@ export class TeamService {
         .select('name isFavorite')
         .sort({ isFavorite: -1 });
     } else {
-      teams = await this.teamModel.find(filter).sort({ isFavorite: -1 });
+      teams = await this.teamModel
+        .find(filter)
+        .populate({
+          path: 'members',
+          populate: [
+            {
+              path: 'user',
+              select: 'firstname lastname photo',
+            },
+            {
+              path: 'position',
+            },
+          ],
+        })
+        .sort({ isFavorite: -1 });
     }
     return teams;
   }
