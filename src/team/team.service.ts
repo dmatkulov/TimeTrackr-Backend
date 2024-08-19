@@ -60,17 +60,27 @@ export class TeamService {
     }
   }
 
-  async get(user: UserDocument) {
+  async get(user: UserDocument, teamList: string) {
     const userID = user._id;
 
+    let teams: TeamDocument[];
     const filter: FilterQuery<TeamDocument> = {
       $or: [{ teamLead: userID }, { 'members.user': userID }],
     };
 
-    return this.teamModel
-      .find(filter)
-      .select('name isFavorite')
-      .sort({ isFavorite: -1 });
+    if (teamList) {
+      teams = await this.teamModel
+        .find(filter)
+        .select('name isFavorite')
+        .sort({ isFavorite: -1 });
+    } else {
+      teams = await this.teamModel.find(filter).sort({ isFavorite: -1 });
+    }
+    return teams;
+  }
+
+  async getOne(id: Types.ObjectId) {
+    return this.teamModel.findById(id).sort({ isFavorite: -1 });
   }
 
   async toggleFavourite(id: Types.ObjectId, dto: ToggleFavouriteDto) {
