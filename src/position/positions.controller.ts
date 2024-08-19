@@ -15,7 +15,7 @@ import { Roles } from '../utils/decorators/roles.decorator';
 import { Role } from '../utils/enums/role.enum';
 import { RolesGuard } from '../utils/guards/roles.guard';
 import { JWTGuard } from '../utils/guards/token.guard';
-import { CreatePositionDto } from '../dto/create-position.dto';
+import { CreatePositionDto } from './dto/create-position.dto';
 import { ParseObjectIdPipe } from 'nestjs-object-id';
 import { Types } from 'mongoose';
 

@@ -80,8 +80,8 @@ export class TaskService {
 
   async getAll(user: UserDocument, userId: string, date: string) {
     let filter: FilterQuery<TaskDocument> = {};
-    const isAdmin = user.role === Role.Admin;
-    const isEmployee = user.role === Role.User;
+    const isAdmin = user.roles.includes(Role.Admin);
+    const isEmployee = user.roles.includes(Role.User);
 
     if (isAdmin) {
       if (userId && date) {
@@ -109,8 +109,8 @@ export class TaskService {
 
   async getOne(user: UserDocument, id: Types.ObjectId, taskId: string) {
     let filter: FilterQuery<TaskDocument> = {};
-    const isAdmin = user.role === Role.Admin;
-    const isEmployee = user.role === Role.User;
+    const isAdmin = user.roles.includes(Role.Admin);
+    const isEmployee = user.roles.includes(Role.User);
     const existingDesk = await this.taskModel.findById(id);
 
     if (isAdmin) {
@@ -165,7 +165,7 @@ export class TaskService {
     taskId: string,
   ) {
     let filter: FilterQuery<TaskDocument> = {};
-    const isEmployee = user.role === Role.User;
+    const isEmployee = user.roles.includes(Role.User);
     const existingTicket = await this.taskModel.findById(id);
 
     if (!existingTicket) {
@@ -227,8 +227,8 @@ export class TaskService {
 
   async deleteOne(id: Types.ObjectId, taskId: string, user: UserDocument) {
     const task = await this.taskModel.findById(id);
-    const isAdmin = user.role === Role.Admin;
-    const isEmployee = user.role === Role.User;
+    const isAdmin = user.roles.includes(Role.Admin);
+    const isEmployee = user.roles.includes(Role.User);
 
     let filter: FilterQuery<TaskDocument>;
 

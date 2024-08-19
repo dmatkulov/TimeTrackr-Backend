@@ -2,14 +2,16 @@ import {
   BadRequestException,
   Injectable,
   UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../user/shema/user.schema';
-import { Model } from 'mongoose';
+import mongoose, { Model, mongo } from 'mongoose';
 import { Request } from 'express';
 import { randomUUID } from 'crypto';
 import { OAuth2Client } from 'google-auth-library';
-import { Position, PositionDocument } from '../schemas/position.schema';
+import { Position, PositionDocument } from '../position/schema/position.schema';
+import { AuthDto } from './auth.dto';
 
 const client = new OAuth2Client(process.env['GOOGLE_CLIENT_ID']);
 
@@ -42,10 +44,47 @@ export class AuthService {
     throw new UnauthorizedException('Введите корректные данные!');
   }
 
+  async register(file: Express.Multer.File, createUserDto: AuthDto) {
+    try {
+      const newUser = new this.userModel({
+        email: createUserDto.email,
+        password: createUserDto.password,
+        firstname: createUserDto.firstname,
+        lastname: createUserDto.lastname,
+        roles: createUserDto.role,
+      });
+
+      newUser.generateToken();
+
+      await newUser.save();
+
+      const user = await this.userModel.findById(newUser._id);
+      return { message: 'Регистрация прошла успешно', user };
+    } catch (e) {
+      if (e instanceof mongoose.Error.ValidationError) {
+        throw new UnprocessableEntityException(e);
+      }
+
+      if (e instanceof mongo.MongoServerError && e.code === 11000) {
+        const error = {
+          message: [
+            {
+              property: 'email',
+              message: 'Такая почта уже была зарегистрирована',
+            },
+          ],
+          error: 'Unprocessable Entity',
+          statusCode: 422,
+        };
+        throw new UnprocessableEntityException(error);
+      }
+
+      throw e;
+    }
+  }
+
   async login(activeUser: UserDocument) {
-    const user = await this.userModel
-      .findById(activeUser._id)
-      .populate('position');
+    const user = await this.userModel.findById(activeUser._id);
     return { message: `С возвращением, ${user.firstname}!`, user };
   }
 
@@ -66,7 +105,6 @@ export class AuthService {
     const firstname = payload['given_name'];
     const lastname = payload['family_name'];
     const photo = payload['picture'];
-    const position = await this.positionModel.findOne({ name: 'Не назначено' });
 
     if (!email) {
       throw new BadRequestException('Email is not present!');
@@ -80,7 +118,6 @@ export class AuthService {
         email,
         firstname,
         lastname,
-        position,
         photo,
         password: randomUUID(),
         googleID: id,
@@ -95,9 +132,7 @@ export class AuthService {
     googleUser.generateToken();
     await googleUser.save();
 
-    const user = await this.userModel
-      .findOne({ googleID: id })
-      .populate('position');
+    const user = await this.userModel.findOne({ googleID: id });
 
     return { message, user };
   }

@@ -1,9 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { compare, genSalt, hash } from 'bcrypt';
-import mongoose, { Document } from 'mongoose';
+import { Document } from 'mongoose';
 import * as jwt from 'jsonwebtoken';
 import { Role } from '../../utils/enums/role.enum';
-import { Position } from '../../schemas/position.schema';
 
 const SALT_WORK_FACTOR = 10;
 const JWT_SECRET = process.env.SECRET_KEY || 'secret_KEY';
@@ -14,10 +13,6 @@ export interface UserMethods {
 
   checkPassword(password: string): Promise<boolean>;
 }
-
-const validateGoogleUser = function (this: UserDocument) {
-  return !this.googleID;
-};
 
 @Schema()
 export class User {
@@ -43,16 +38,10 @@ export class User {
   photo: string;
 
   @Prop({
-    ref: Position.name,
-    required: validateGoogleUser,
-  })
-  position: mongoose.Schema.Types.ObjectId;
-
-  @Prop({
     required: true,
     default: Role.User,
   })
-  role: Role;
+  roles: Role[];
 
   @Prop({ required: false, type: String })
   googleID?: string;

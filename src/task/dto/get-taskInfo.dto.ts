@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { TaskLabel } from '../../utils/enums/task-label.enum';
+import { LabelEnum } from '../../utils/enums/label.enum';
 
 export class GetTaskInfoDto {
   _id: string;
@@ -21,8 +21,8 @@ export class GetTaskInfoDto {
   description: string;
 
   @IsNotEmpty()
-  @IsEnum(TaskLabel)
-  label: TaskLabel;
+  @IsEnum(LabelEnum)
+  label: LabelEnum;
 
   timeSpent: number;
 }

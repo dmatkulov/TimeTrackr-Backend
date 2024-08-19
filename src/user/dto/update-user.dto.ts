@@ -1,11 +1,4 @@
-import {
-  IsEmail,
-  IsMongoId,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-} from 'class-validator';
-import mongoose from 'mongoose';
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class UpdateUserDto {
   @IsEmail({}, { message: 'Неверный формат почты' })
@@ -25,8 +18,8 @@ export class UpdateUserDto {
 
   @IsOptional()
   phoneNumber: string;
-
-  @IsNotEmpty()
-  @IsMongoId()
-  position: mongoose.Schema.Types.ObjectId;
+  //
+  // @IsNotEmpty()
+  // @IsMongoId()
+  // position: mongoose.Schema.Types.ObjectId;
 }

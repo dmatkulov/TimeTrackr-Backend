@@ -7,8 +7,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 
 import { User, UserDocument } from './shema/user.schema';
-import mongoose, { FilterQuery, Model, mongo, Types } from 'mongoose';
-import { CreateUserDto } from './dto/create-user.dto';
+import mongoose, { FilterQuery, Model, Types } from 'mongoose';
 import { Role } from '../utils/enums/role.enum';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdatePhotoDto } from './dto/update-photo.dto';
@@ -20,50 +19,8 @@ export class UserService {
     private userModel: Model<UserDocument>,
   ) {}
 
-  async createOne(file: Express.Multer.File, createUserDto: CreateUserDto) {
-    try {
-      const newUser = new this.userModel({
-        email: createUserDto.email,
-        password: createUserDto.password,
-        firstname: createUserDto.firstname,
-        lastname: createUserDto.lastname,
-        photo: file ? '/uploads/' + file.filename : null,
-        // phoneNumber: createUserDto.phoneNumber
-        //   ? createUserDto.phoneNumber
-        //   : 996220222222,
-        position: createUserDto.position,
-        roles: createUserDto.role,
-      });
-
-      newUser.generateToken();
-
-      await newUser.save();
-
-      const user = await this.userModel
-        .findById(newUser._id)
-        .populate('position');
-      return { message: 'Регистрация прошла успешно', user };
-    } catch (e) {
-      if (e instanceof mongoose.Error.ValidationError) {
-        throw new UnprocessableEntityException(e);
-      }
-
-      if (e instanceof mongo.MongoServerError && e.code === 11000) {
-        const error = {
-          message: [
-            {
-              property: 'email',
-              message: 'Такая почта уже была зарегистрирована',
-            },
-          ],
-          error: 'Unprocessable Entity',
-          statusCode: 422,
-        };
-        throw new UnprocessableEntityException(error);
-      }
-
-      throw e;
-    }
+  async getUsers() {
+    return this.userModel.find();
   }
 
   async getAll(positions: string, email: string, lastname: string) {
@@ -97,7 +54,6 @@ export class UserService {
 
     const users: UserDocument[] = await this.userModel
       .find(filter)
-      .populate('position')
       .select('email firstname lastname position photo')
       .sort({ startDate: -1 });
     if (users.length === 0) {
@@ -110,7 +66,7 @@ export class UserService {
   }
 
   async getOne(id: Types.ObjectId) {
-    const user = await this.userModel.findById(id).populate('position');
+    const user = await this.userModel.findById(id);
 
     if (!user) {
       throw new NotFoundException({ message: 'Пользователь не найден!' });
@@ -125,8 +81,8 @@ export class UserService {
     dto: UpdateUserDto,
     currentUser: UserDocument,
   ) {
-    const isAdmin = currentUser.role === Role.Admin;
-    const isEmployee = currentUser.role === Role.User;
+    const isAdmin = currentUser.roles.includes(Role.Admin);
+    const isEmployee = currentUser.roles.includes(Role.User);
 
     const existingUser = await this.userModel.findById(id);
 
@@ -159,21 +115,20 @@ export class UserService {
         lastname: dto.lastname,
         photo: image,
         phoneNumber: phone,
-        position: dto.position,
       };
 
       if (isEmployee && existingUser._id.equals(currentUser._id)) {
-        user = await this.userModel
-          .findOneAndUpdate(
-            { _id: currentUser._id },
-            { $set: update },
-            { new: true },
-          )
-          .populate('position');
+        user = await this.userModel.findOneAndUpdate(
+          { _id: currentUser._id },
+          { $set: update },
+          { new: true },
+        );
       } else if (isAdmin) {
-        user = await this.userModel
-          .findOneAndUpdate(id, { $set: update }, { new: true })
-          .populate('position');
+        user = await this.userModel.findOneAndUpdate(
+          id,
+          { $set: update },
+          { new: true },
+        );
       } else {
         return new UnauthorizedException({
           message: 'Вы не сможете вносить изменения',
@@ -200,7 +155,7 @@ export class UserService {
     dto: UpdatePhotoDto,
     currentUser: UserDocument,
   ) {
-    const isUser = currentUser.role === Role.User;
+    const isUser = currentUser.roles.includes(Role.User);
 
     const existingUser = await this.userModel.findById(id);
 
@@ -225,13 +180,11 @@ export class UserService {
       };
 
       if (isUser && existingUser._id.equals(currentUser._id)) {
-        user = await this.userModel
-          .findOneAndUpdate(
-            { _id: currentUser._id },
-            { $set: update },
-            { new: true },
-          )
-          .populate('position');
+        user = await this.userModel.findOneAndUpdate(
+          { _id: currentUser._id },
+          { $set: update },
+          { new: true },
+        );
       } else {
         return new UnauthorizedException({
           message: 'Вы не сможете вносить изменения',
