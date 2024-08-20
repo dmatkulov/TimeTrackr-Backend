@@ -56,17 +56,8 @@ export class FixturesService {
         firstname: 'Максим',
         lastname: 'Хренов',
         phoneNumber: '996220965222',
-        photo: 'fixtures/avatars/nazgul.jpg',
-        roles: Role.User,
-      },
-      {
-        email: 'frontend@gmail.com',
-        password: 'qwerty12',
-        firstname: 'Максим',
-        lastname: 'Иванов',
-        phoneNumber: '996220965222',
         photo: 'fixtures/avatars/maxim.jpg',
-        role: Role.User,
+        roles: Role.User,
       },
       {
         email: 'designer@gmail.com',
