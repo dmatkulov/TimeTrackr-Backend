@@ -25,10 +25,17 @@ import { TeamService } from './team/team.service';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { Team, TeamSchema } from './team/schema/team.schema';
+import { CompanyService } from './company/company.service';
+import { CompanyController } from './company/company.controller';
+import { Company, CompanySchema } from './company/schema/company.schema';
+import * as process from 'node:process';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost/trckr'),
+    MongooseModule.forRoot(
+      process.env.MONGO_DB_URL || 'mongodb://localhost/trckr',
+    ),
+    MongooseModule.forFeature([{ name: Company.name, schema: CompanySchema }]),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([
       { name: Position.name, schema: PositionSchema },
@@ -51,6 +58,7 @@ import { Team, TeamSchema } from './team/schema/team.schema';
 
     PositionsController,
     TaskController,
+    CompanyController,
   ],
   providers: [
     AppService,
@@ -68,6 +76,7 @@ import { Team, TeamSchema } from './team/schema/team.schema';
     SeedCommandService,
     FixturesService,
     CalculatorService,
+    CompanyService,
   ],
 })
 export class AppModule {}

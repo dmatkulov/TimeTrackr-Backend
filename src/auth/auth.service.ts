@@ -10,7 +10,6 @@ import mongoose, { Model, mongo } from 'mongoose';
 import { Request } from 'express';
 import { randomUUID } from 'crypto';
 import { OAuth2Client } from 'google-auth-library';
-import { Position, PositionDocument } from '../position/schema/position.schema';
 import { AuthDto } from './auth.dto';
 
 const client = new OAuth2Client(process.env['GOOGLE_CLIENT_ID']);
@@ -20,8 +19,6 @@ export class AuthService {
   constructor(
     @InjectModel(User.name)
     private userModel: Model<UserDocument>,
-    @InjectModel(Position.name)
-    private positionModel: Model<PositionDocument>,
   ) {}
 
   async validateUser(
