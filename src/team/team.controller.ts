@@ -33,7 +33,7 @@ export class TeamController {
     return this.teamService.get(user, teamList);
   }
 
-  @Roles(Role.User)
+  @Roles(Role.TeamLead)
   @UseGuards(JWTGuard, RolesGuard)
   @Post('new-team')
   @UsePipes(new ValidationPipe())
@@ -50,7 +50,7 @@ export class TeamController {
 
   @Roles(Role.User)
   @UseGuards(JWTGuard, RolesGuard)
-  @Patch('toogle-favourite/:id')
+  @Patch('toggle-favourite/:id')
   toggle(
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
     @Body() dto: ToggleFavouriteDto,

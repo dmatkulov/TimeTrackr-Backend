@@ -6,6 +6,7 @@ import { CreateCompanyDto } from './dto/create-company.dto';
 import { Role } from '../utils/enums/role.enum';
 import { AuthService } from '../auth/auth.service';
 import { Position, PositionDocument } from '../position/schema/position.schema';
+import { PositionEnum } from '../utils/enums/position.enum';
 
 @Injectable()
 export class CompanyService {
@@ -44,7 +45,9 @@ export class CompanyService {
       company.generateId();
       await company.save();
 
-      const position = await this.positionModel.findOne({ name: 'Владелец' });
+      const position = await this.positionModel.findOne({
+        name: PositionEnum.Admin,
+      });
       const owner = await this.authService.register({
         ...dto.owner,
         companyID: company.companyID,

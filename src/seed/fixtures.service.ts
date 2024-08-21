@@ -6,6 +6,7 @@ import { User, UserDocument } from '../user/shema/user.schema';
 import { Role } from '../utils/enums/role.enum';
 import { PositionEnum } from '../utils/enums/position.enum';
 import { TagEnum } from '../utils/enums/tag.enum';
+import { Company, CompanyDocument } from '../company/schema/company.schema';
 
 @Injectable()
 export class FixturesService {
@@ -14,6 +15,8 @@ export class FixturesService {
     private readonly positionModel: Model<Position>,
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
+    @InjectModel(Company.name)
+    private readonly companyModel: Model<CompanyDocument>,
   ) {}
 
   async seedPositions() {
@@ -30,16 +33,59 @@ export class FixturesService {
     }
   }
 
+  async seedCompany() {
+    const company = new this.companyModel({
+      name: 'Neo',
+    });
+
+    company.generateId();
+    await company.save();
+
+    const position = await this.positionModel.findOne({
+      name: PositionEnum.Admin,
+    });
+    const owner = new this.userModel({
+      email: 'admin@gmail.com',
+      password: '1Qwerty12-',
+      firstname: 'John',
+      lastname: 'Space',
+      companyID: company._id,
+      position: position._id,
+      roles: [Role.Owner, Role.Admin],
+    });
+
+    owner.generateToken();
+
+    await owner.save();
+
+    const newCompany = await this.companyModel.findByIdAndUpdate(
+      company._id,
+      { $set: { owner: owner._id } },
+      { new: true },
+    );
+    await newCompany.save();
+  }
+
   async seedUsers() {
+    const positions = await this.positionModel.find();
+
+    const assignPosition = (name: PositionEnum) => {
+      const pId = positions.filter((position) => position.name === name);
+      return pId[0]._id;
+    };
+
+    const company = await this.companyModel.findOne();
     const usersData = [
       {
-        email: 'admin@gmail.com',
+        email: 'test@gmail.com',
         password: 'qwerty12',
         firstname: 'Дильшад',
         lastname: 'Mаткулов',
         phoneNumber: '996220965222',
         photo: 'fixtures/avatars/dilshad.jpg',
-        roles: Role.Admin,
+        companyID: company._id,
+        position: assignPosition(PositionEnum.Developer),
+        roles: [Role.TeamLead, Role.User],
       },
       {
         email: 'manager@gmail.com',
@@ -48,6 +94,8 @@ export class FixturesService {
         lastname: 'Доолоткелдиева',
         phoneNumber: '996220965222',
         photo: 'fixtures/avatars/nazgul.jpg',
+        companyID: company._id,
+        position: assignPosition(PositionEnum.ProjectManager),
         roles: Role.User,
       },
       {
@@ -57,6 +105,8 @@ export class FixturesService {
         lastname: 'Хренов',
         phoneNumber: '996220965222',
         photo: 'fixtures/avatars/maxim.jpg',
+        companyID: company._id,
+        position: assignPosition(PositionEnum.Developer),
         roles: Role.User,
       },
       {
@@ -66,6 +116,8 @@ export class FixturesService {
         lastname: 'Борисова',
         phoneNumber: '996220965222',
         photo: 'fixtures/avatars/jamal.jpg',
+        companyID: company._id,
+        position: assignPosition(PositionEnum.Designer),
         role: Role.User,
       },
       {
@@ -75,6 +127,8 @@ export class FixturesService {
         lastname: 'Doe',
         phoneNumber: '996220965222',
         photo: 'fixtures/avatars/john.jpg',
+        companyID: company._id,
+        position: assignPosition(PositionEnum.DevOps),
         role: Role.User,
       },
       {
@@ -84,6 +138,19 @@ export class FixturesService {
         lastname: 'Исмаилов',
         phoneNumber: '996220965222',
         photo: 'fixtures/avatars/bektur.jpg',
+        companyID: company._id,
+        position: assignPosition(PositionEnum.Analyst),
+        role: Role.User,
+      },
+      {
+        email: 'tim@gmail.com',
+        password: 'qwerty12',
+        firstname: 'Тимур',
+        lastname: 'Тимуров',
+        phoneNumber: '996220965222',
+        photo: 'fixtures/avatars/bektur.jpg',
+        companyID: company._id,
+        position: assignPosition(PositionEnum.Tester),
         role: Role.User,
       },
     ];
