@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { randomUUID } from 'crypto';
+import mongoose from 'mongoose';
 
 export interface CompanyMethods {
   generateId: () => void;
@@ -9,6 +10,12 @@ export interface CompanyMethods {
 export class Company {
   @Prop({ required: true, unique: true })
   name: string;
+
+  @Prop({
+    ref: 'User',
+    type: mongoose.Schema.Types.ObjectId,
+  })
+  owner: mongoose.Schema.Types.ObjectId;
 
   @Prop({ required: true })
   companyID: string;

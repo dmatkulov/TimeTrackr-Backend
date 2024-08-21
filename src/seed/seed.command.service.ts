@@ -24,7 +24,7 @@ export class SeedCommandService {
     }
 
     await this.fixturesService.seedPositions();
-    await this.fixturesService.seedUsers();
+    // await this.fixturesService.seedUsers();
 
     await this.closeConnection(db);
   }

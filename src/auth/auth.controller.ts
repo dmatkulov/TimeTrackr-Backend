@@ -4,7 +4,6 @@ import {
   Delete,
   Post,
   Req,
-  UploadedFile,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -23,8 +22,8 @@ export class AuthController {
 
   @UsePipes(new ValidationPipe())
   @Post('register')
-  register(@UploadedFile() file: Express.Multer.File, @Body() dto: AuthDto) {
-    return this.authService.register(file, dto);
+  register(@Body() dto: AuthDto) {
+    return this.authService.register(dto);
   }
 
   @UseGuards(AuthGuard('local'))
