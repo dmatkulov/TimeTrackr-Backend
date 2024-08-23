@@ -37,6 +37,7 @@ export class UserController {
   getUsers() {
     return this.userService.getUsers();
   }
+
   @UseGuards(JWTGuard)
   @Get('filter')
   getAll(

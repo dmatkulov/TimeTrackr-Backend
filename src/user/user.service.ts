@@ -20,7 +20,9 @@ export class UserService {
   ) {}
 
   async getUsers() {
-    return this.userModel.find();
+    return this.userModel.find({
+      $nor: [{ roles: Role.Owner }],
+    });
   }
 
   async getAll(positions: string, email: string, lastname: string) {

@@ -16,6 +16,10 @@ export interface UserMethods {
   checkPassword(password: string): Promise<boolean>;
 }
 
+const validateGoogleUser = function (this: UserDocument) {
+  return !this.googleID;
+};
+
 @Schema()
 export class User {
   @Prop({ required: true, unique: true })
@@ -48,14 +52,14 @@ export class User {
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: Company.name,
-    required: true,
+    required: validateGoogleUser,
   })
   companyID: mongoose.Schema.Types.ObjectId;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: Position.name,
-    required: true,
+    required: validateGoogleUser,
   })
   position: mongoose.Schema.Types.ObjectId;
 

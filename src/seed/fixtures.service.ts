@@ -77,7 +77,7 @@ export class FixturesService {
     const company = await this.companyModel.findOne();
     const usersData = [
       {
-        email: 'test@gmail.com',
+        email: 'lead@gmail.com',
         password: 'qwerty12',
         firstname: 'Дильшад',
         lastname: 'Mаткулов',
@@ -86,6 +86,17 @@ export class FixturesService {
         companyID: company._id,
         position: assignPosition(PositionEnum.Developer),
         roles: [Role.TeamLead, Role.User],
+      },
+      {
+        email: 'admin@gmail.com',
+        password: 'qwerty12',
+        firstname: 'Админ',
+        lastname: 'Администратор',
+        phoneNumber: '996220965222',
+        photo: 'fixtures/avatars/john.jpg',
+        companyID: company._id,
+        position: assignPosition(PositionEnum.Admin),
+        roles: Role.Admin,
       },
       {
         email: 'manager@gmail.com',
