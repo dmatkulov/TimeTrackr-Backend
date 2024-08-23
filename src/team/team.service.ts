@@ -78,7 +78,13 @@ export class TeamService {
   }
 
   async getOne(id: Types.ObjectId) {
-    return this.teamModel.findById(id).sort({ isFavorite: -1 });
+    return this.teamModel.findById(id).populate({
+      path: 'members',
+      select: 'firstname lastname photo position',
+      populate: {
+        path: 'position',
+      },
+    });
   }
 
   async toggleFavourite(user: UserDocument, id: Types.ObjectId) {

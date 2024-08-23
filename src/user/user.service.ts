@@ -19,10 +19,13 @@ export class UserService {
     private userModel: Model<UserDocument>,
   ) {}
 
-  async getUsers() {
-    return this.userModel.find({
-      $nor: [{ roles: Role.Owner }],
-    });
+  async getUsers(user: UserDocument) {
+    return this.userModel
+      .find({
+        companyID: user.companyID,
+        roles: { $nin: [Role.Owner, Role.Admin, Role.TeamLead] },
+      })
+      .populate('position');
   }
 
   async getAll(positions: string, email: string, lastname: string) {
