@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -20,6 +21,7 @@ import { CreateTeamDto } from './dto/create-team.dto';
 import { UserDocument } from '../user/shema/user.schema';
 import { ParseObjectIdPipe } from 'nestjs-object-id';
 import { Types } from 'mongoose';
+import { UpdateTeamDto } from './dto/update-team.dto';
 
 @Controller('teams')
 export class TeamController {
@@ -43,18 +45,42 @@ export class TeamController {
   @Roles(Role.User, Role.TeamLead)
   @UseGuards(JWTGuard, RolesGuard)
   @Get('/:id')
-  getOne(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
-    return this.teamService.getOne(id);
+  getOne(
+    @GetUser() user: UserDocument,
+    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+  ) {
+    return this.teamService.getOne(user, id);
   }
 
   @Roles(Role.User, Role.TeamLead)
   @UseGuards(JWTGuard, RolesGuard)
   @Patch('toggle-favourite/:id')
-  toggle(
+  toggleFavourite(
     @GetUser() user: UserDocument,
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
-    // @Body() dto: ToggleFavouriteDto,
   ) {
     return this.teamService.toggleFavourite(user, id);
+  }
+
+  @Roles(Role.TeamLead)
+  @UseGuards(JWTGuard, RolesGuard)
+  @Patch('update-members/:id')
+  update(
+    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+    @GetUser() user: UserDocument,
+    @Body() dto: UpdateTeamDto,
+  ) {
+    return this.teamService.update(user, id, dto);
+  }
+
+  @Roles(Role.TeamLead)
+  @UseGuards(JWTGuard, RolesGuard)
+  @Delete('delete-members/:id')
+  deleteMembers(
+    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+    @GetUser() user: UserDocument,
+    @Body() dto: UpdateTeamDto,
+  ) {
+    return this.teamService.deleteMembers(user, id, dto);
   }
 }

@@ -1,10 +1,15 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { FilterQuery, Model, mongo, Types } from 'mongoose';
 import { Team, TeamDocument } from './schema/team.schema';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UserDocument } from '../user/shema/user.schema';
 import { Role } from '../utils/enums/role.enum';
+import { UpdateTeamDto } from './dto/update-team.dto';
 
 @Injectable()
 export class TeamService {
@@ -51,14 +56,14 @@ export class TeamService {
     const isTeamLead = user.roles.includes(Role.TeamLead);
     const isUser = user.roles.includes(Role.User);
 
-    let filter: FilterQuery<TeamDocument> = {};
+    const filter: FilterQuery<TeamDocument> = { companyID: user.companyID };
 
     if (isTeamLead) {
-      filter = {};
+      filter.teamLead = user._id;
     } else if (isUser) {
-      filter = { members: user._id };
+      filter.members = user._id;
     } else if (userTeams) {
-      filter = { members: userTeams };
+      filter.members = userTeams;
     }
 
     const teams = await this.teamModel
@@ -77,23 +82,101 @@ export class TeamService {
     });
   }
 
-  async getOne(id: Types.ObjectId) {
-    return this.teamModel.findById(id).populate({
-      path: 'members',
-      select: 'firstname lastname photo position',
-      populate: {
-        path: 'position',
-      },
-    });
+  async getOne(user: UserDocument, id: Types.ObjectId) {
+    return this.teamModel
+      .findOne({ _id: id, companyID: user.companyID })
+      .populate({
+        path: 'members',
+        select: 'firstname lastname photo position',
+        populate: {
+          path: 'position',
+        },
+      });
+  }
+
+  async deleteMembers(
+    user: UserDocument,
+    id: Types.ObjectId,
+    dto: UpdateTeamDto,
+  ) {
+    try {
+      const filter: FilterQuery<TeamDocument> = {
+        _id: id,
+        companyID: user.companyID,
+        teamLead: user._id,
+      };
+      const existingTeam = await this.teamModel.findOne(filter);
+
+      if (!existingTeam) {
+        throw new NotFoundException({ message: 'Команда не найдена' });
+      }
+
+      await this.teamModel.findOneAndUpdate(
+        filter,
+        {
+          $pull: {
+            members: { $in: dto.members.map((id) => new Types.ObjectId(id)) },
+          },
+        },
+        { new: true },
+      );
+
+      return { message: 'Участники удалены' };
+    } catch (e) {
+      throw new NotFoundException(e);
+    }
+  }
+
+  async update(user: UserDocument, id: Types.ObjectId, dto: UpdateTeamDto) {
+    try {
+      const filter: FilterQuery<TeamDocument> = {
+        _id: id,
+        companyID: user.companyID,
+        teamLead: user._id,
+      };
+
+      await this.teamModel.findOne(filter);
+
+      if (dto.members) {
+        await this.teamModel.findOneAndUpdate(
+          filter,
+          { $addToSet: { members: { $each: dto.members } } },
+          { new: true },
+        );
+        return { message: 'Новые участники успешно добавлены' };
+      } else if (dto.name || dto.description) {
+        await this.teamModel.findOneAndUpdate(
+          filter,
+          { $set: { name: dto.name, description: dto.description } },
+          { new: true },
+        );
+
+        return { message: 'Изменения успешно внесены' };
+      }
+    } catch (e) {
+      if (e instanceof mongoose.Error.ValidationError) {
+        throw new UnprocessableEntityException(e);
+      }
+
+      if (e instanceof mongoose.Error.DocumentNotFoundError) {
+        throw new NotFoundException({ message: 'Команда не найдена' });
+      }
+
+      throw e;
+    }
   }
 
   async toggleFavourite(user: UserDocument, id: Types.ObjectId) {
     const existingTeam = await this.teamModel.findOne({
       _id: id,
+      companyID: user.companyID,
       isFavorite: user._id,
     });
 
-    const filter: FilterQuery<TeamDocument> = { _id: id };
+    const filter: FilterQuery<TeamDocument> = {
+      _id: id,
+      companyID: user.companyID,
+    };
     let update = {};
 
     if (existingTeam) {

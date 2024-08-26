@@ -70,7 +70,7 @@ export class User {
 export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.methods.generateToken = function () {
-  const payload = { role: this._id, _id: this._id, email: this.email };
+  const payload = { roles: this.roles, _id: this._id, email: this.email };
   this.token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRATION });
 };
 
