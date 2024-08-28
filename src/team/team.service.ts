@@ -166,6 +166,18 @@ export class TeamService {
     }
   }
 
+  async delete(user: UserDocument, id: Types.ObjectId) {
+    try {
+      await this.teamModel.findByIdAndDelete({
+        _id: id,
+        companyID: user.companyID,
+        isFavorite: user._id,
+      });
+    } catch (e) {
+      throw new NotFoundException(e);
+    }
+  }
+
   async toggleFavourite(user: UserDocument, id: Types.ObjectId) {
     const existingTeam = await this.teamModel.findOne({
       _id: id,

@@ -75,6 +75,16 @@ export class TeamController {
 
   @Roles(Role.TeamLead)
   @UseGuards(JWTGuard, RolesGuard)
+  @Delete('delete-team/:id')
+  delete(
+    @GetUser() user: UserDocument,
+    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+  ) {
+    return this.teamService.delete(user, id);
+  }
+
+  @Roles(Role.TeamLead)
+  @UseGuards(JWTGuard, RolesGuard)
   @Delete('delete-members/:id')
   deleteMembers(
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
