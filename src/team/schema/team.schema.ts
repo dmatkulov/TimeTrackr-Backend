@@ -5,14 +5,12 @@ import { Company } from '../../company/schema/company.schema';
 
 @Schema()
 export class Team {
-  @Prop({ required: true, unique: true })
-  name: string;
-
-  @Prop({ required: false })
-  description: string;
-
-  @Prop({ type: String })
-  icon: string;
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: Company.name,
+    required: true,
+  })
+  companyID: mongoose.Schema.Types.ObjectId;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -21,12 +19,14 @@ export class Team {
   })
   teamLead: mongoose.Schema.Types.ObjectId;
 
-  @Prop({
-    type: mongoose.Schema.Types.ObjectId,
-    ref: Company.name,
-    required: true,
-  })
-  companyID: mongoose.Schema.Types.ObjectId;
+  @Prop({ required: true, unique: true })
+  name: string;
+
+  @Prop({ required: false })
+  description: string;
+
+  @Prop({ type: String })
+  icon: string;
 
   @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: User.name }])
   isFavorite: mongoose.Schema.Types.ObjectId[];

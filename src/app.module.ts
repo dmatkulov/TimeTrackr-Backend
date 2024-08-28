@@ -28,7 +28,10 @@ import { Team, TeamSchema } from './team/schema/team.schema';
 import { CompanyService } from './company/company.service';
 import { CompanyController } from './company/company.controller';
 import { Company, CompanySchema } from './company/schema/company.schema';
+import { ProjectService } from './project/project.service';
+import { ProjectController } from './project/project.controller';
 import * as process from 'node:process';
+import { Project, ProjectSchema } from './project/schema/project.schema';
 
 @Module({
   imports: [
@@ -40,6 +43,7 @@ import * as process from 'node:process';
     MongooseModule.forFeature([
       { name: Position.name, schema: PositionSchema },
     ]),
+    MongooseModule.forFeature([{ name: Project.name, schema: ProjectSchema }]),
     MongooseModule.forFeature([{ name: Task.name, schema: TaskSchema }]),
     MongooseModule.forFeature([{ name: Team.name, schema: TeamSchema }]),
     PassportModule,
@@ -59,6 +63,7 @@ import * as process from 'node:process';
     PositionsController,
     TaskController,
     CompanyController,
+    ProjectController,
   ],
   providers: [
     AppService,
@@ -77,6 +82,7 @@ import * as process from 'node:process';
     FixturesService,
     CalculatorService,
     CompanyService,
+    ProjectService,
   ],
 })
 export class AppModule {}
