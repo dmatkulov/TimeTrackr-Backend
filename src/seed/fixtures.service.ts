@@ -7,16 +7,27 @@ import { Role } from '../utils/enums/role.enum';
 import { PositionEnum } from '../utils/enums/position.enum';
 import { TagEnum } from '../utils/enums/tag.enum';
 import { Company, CompanyDocument } from '../company/schema/company.schema';
+import { Team, TeamDocument } from '../team/schema/team.schema';
+import { Project, ProjectDocument } from '../project/schema/project.schema';
+import { ProjectEnum } from '../utils/enums/project.enum';
 
 @Injectable()
 export class FixturesService {
   constructor(
     @InjectModel(Position.name)
     private readonly positionModel: Model<Position>,
+
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
+
     @InjectModel(Company.name)
     private readonly companyModel: Model<CompanyDocument>,
+
+    @InjectModel(Team.name)
+    private readonly teamModel: Model<TeamDocument>,
+
+    @InjectModel(Project.name)
+    private readonly projectModel: Model<ProjectDocument>,
   ) {}
 
   async seedPositions() {
@@ -85,7 +96,7 @@ export class FixturesService {
         photo: 'fixtures/avatars/dilshad.jpg',
         companyID: company._id,
         position: assignPosition(PositionEnum.Developer),
-        roles: [Role.TeamLead, Role.User],
+        roles: Role.TeamLead,
       },
       {
         email: 'admin@gmail.com',
@@ -171,5 +182,60 @@ export class FixturesService {
       user.generateToken();
       await user.save();
     }
+  }
+
+  async seedTeams() {
+    const company = await this.companyModel.findOne();
+
+    const teamLead = await this.userModel.findOne({ roles: Role.TeamLead });
+    const members = await this.userModel.find({
+      roles: { $nin: [Role.Owner, Role.Admin, Role.TeamLead] },
+    });
+
+    const team = new this.teamModel({
+      teamLead: teamLead,
+      companyID: company._id,
+      name: 'JS20',
+      description: 'Группа ESDP Javascript–20',
+      isFavorite: [members[0], members[1]],
+      members: [members[0], members[1], members[2]],
+    });
+
+    await team.save();
+  }
+
+  async seedProjects() {
+    const team = await this.teamModel.findOne();
+    const teamLead = await this.userModel.findOne({ roles: Role.TeamLead });
+    const members = await this.userModel.find({
+      roles: { $nin: [Role.Owner, Role.Admin, Role.TeamLead] },
+    });
+
+    const project = new this.projectModel({
+      companyID: teamLead.companyID,
+      teamID: team,
+      teamLead: teamLead,
+      name: 'Task management app',
+      description: 'Приложение для менеджмента задач для молодых компаний',
+      deadline: '2024-10-01',
+      isFavorite: [members[0], members[1]],
+      type: ProjectEnum.NEW_PRODUCT_LAUNCH,
+      tasks: [
+        {
+          user: members[0],
+          executionDate: '2024-09-20',
+          title: 'Создать дизайн-систему',
+          timeExpected: '9h',
+        },
+        {
+          user: members[1],
+          executionDate: '2024-09-20',
+          title: 'Создать дизайн главной страницы',
+          timeExpected: '3h',
+        },
+      ],
+    });
+
+    await project.save();
   }
 }

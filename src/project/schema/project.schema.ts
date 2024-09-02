@@ -56,6 +56,9 @@ export class Project {
   @Prop({ type: Boolean, default: false })
   isArchived: boolean;
 
+  @Prop({ type: Boolean, default: false })
+  isOverdue: boolean;
+
   @Prop([
     {
       user: { type: mongoose.Schema.Types.ObjectId, ref: User.name },
@@ -91,4 +94,5 @@ export class Project {
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);
+
 export type ProjectDocument = Project & Document;

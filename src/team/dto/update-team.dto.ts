@@ -1,4 +1,5 @@
 import { IsArray, IsMongoId, IsOptional } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class UpdateTeamDto {
   @IsOptional()
@@ -10,5 +11,5 @@ export class UpdateTeamDto {
   @IsOptional()
   @IsArray()
   @IsMongoId({ each: true })
-  members?: string[];
+  members?: Types.ObjectId[];
 }

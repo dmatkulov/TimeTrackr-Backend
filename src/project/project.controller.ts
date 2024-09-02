@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   Post,
   Put,
@@ -35,14 +36,39 @@ export class ProjectController {
 
   @Roles(Role.TeamLead, Role.User)
   @UseGuards(JWTGuard, RolesGuard)
+  @Get()
+  get(@GetUser() user: UserDocument) {
+    return this.projectService.get(user);
+  }
+
+  @Roles(Role.TeamLead, Role.User)
+  @UseGuards(JWTGuard, RolesGuard)
+  @Get(':id')
+  getOne(
+    @GetUser() user: UserDocument,
+    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+  ) {
+    return this.projectService.getOne(user, id);
+  }
+
+  @Roles(Role.TeamLead, Role.User)
+  @UseGuards(JWTGuard, RolesGuard)
+  @Get(':id')
+  getTask(
+    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+    @Query('taskId') taskId: string,
+  ) {
+    return this.projectService.getTask(id, taskId);
+  }
+
+  @Roles(Role.TeamLead, Role.User)
+  @UseGuards(JWTGuard, RolesGuard)
   @UsePipes(new ValidationPipe())
   @Put('add-tasks/:id')
   addTasks(
-    @Query('teamId') teamId: string,
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
-    @GetUser() user: UserDocument,
     @Body() dto: TaskDto[],
   ) {
-    return this.projectService.addTasks(teamId, user, dto, id);
+    return this.projectService.addTasks(dto, id);
   }
 }

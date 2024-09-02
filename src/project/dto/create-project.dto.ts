@@ -6,10 +6,11 @@ import {
   IsString,
 } from 'class-validator';
 import { ProjectEnum } from '../../utils/enums/project.enum';
+import { Types } from 'mongoose';
 
 export class CreateProjectDto {
   @IsMongoId()
-  teamID: string;
+  teamID: Types.ObjectId;
 
   @IsString()
   @IsNotEmpty()

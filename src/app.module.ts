@@ -10,9 +10,6 @@ import { CommandModule } from 'nestjs-command';
 import { Position, PositionSchema } from './position/schema/position.schema';
 import { PositionsService } from './position/positions.service';
 import { PositionsController } from './position/positions.controller';
-import { Task, TaskSchema } from './task/shema/task.schema';
-import { TaskService } from './task/task.service';
-import { TaskController } from './task/task.controller';
 import { JWTGuard } from './utils/guards/token.guard';
 import { FixturesService } from './seed/fixtures.service';
 import { SeedCommandService } from './seed/seed.command.service';
@@ -44,7 +41,6 @@ import { Project, ProjectSchema } from './project/schema/project.schema';
       { name: Position.name, schema: PositionSchema },
     ]),
     MongooseModule.forFeature([{ name: Project.name, schema: ProjectSchema }]),
-    MongooseModule.forFeature([{ name: Task.name, schema: TaskSchema }]),
     MongooseModule.forFeature([{ name: Team.name, schema: TeamSchema }]),
     PassportModule,
     CommandModule,
@@ -61,7 +57,6 @@ import { Project, ProjectSchema } from './project/schema/project.schema';
     TeamController,
 
     PositionsController,
-    TaskController,
     CompanyController,
     ProjectController,
   ],
@@ -76,7 +71,6 @@ import { Project, ProjectSchema } from './project/schema/project.schema';
 
     TeamService,
     PositionsService,
-    TaskService,
 
     SeedCommandService,
     FixturesService,

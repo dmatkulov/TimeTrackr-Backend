@@ -6,10 +6,11 @@ import {
   IsString,
 } from 'class-validator';
 import { StatusEnum } from '../../utils/enums/status.enum';
+import { Types } from 'mongoose';
 
 export class TaskDto {
   @IsMongoId()
-  user: string;
+  user: Types.ObjectId;
 
   @IsString()
   @IsNotEmpty()
@@ -26,9 +27,10 @@ export class TaskDto {
   @IsEnum(StatusEnum)
   status: StatusEnum;
 
-  timeExpected: string;
+  timeExpected?: string;
 
+  @IsString()
   timeSpent: string;
 
-  timeCalculated: number;
+  timeCalculated?: number;
 }

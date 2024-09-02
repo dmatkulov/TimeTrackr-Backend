@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class CreateTeamDto {
   @IsString()
@@ -18,5 +19,5 @@ export class CreateTeamDto {
   @IsArray()
   @ArrayNotEmpty()
   @IsMongoId({ each: true })
-  members: string[];
+  members: Types.ObjectId[];
 }
