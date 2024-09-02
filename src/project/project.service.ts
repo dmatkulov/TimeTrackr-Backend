@@ -55,44 +55,40 @@ export class ProjectService {
   }
 
   async get(user: UserDocument) {
-    try {
-      const isTeamLead = user.roles.includes(Role.TeamLead);
-      let filter: FilterQuery<ProjectDocument> = {};
+    const isTeamLead = user.roles.includes(Role.TeamLead);
+    let filter: FilterQuery<ProjectDocument>;
 
-      if (isTeamLead) {
-        filter = {
-          teamLead: user._id,
-          companyID: user.companyID,
-        };
-      } else {
-        filter = {
-          'tasks.user': user._id,
-          companyID: user.companyID,
-        };
-      }
-      const projects = await this.projectModel
-        .find(filter)
-        .select('isFavorite name isDone isOverdue')
-        .select('-tasks');
-
-      if (!projects) {
-        throw new NotFoundException('Проекты по вашему запросу не найдены!');
-      }
-
-      return projects.map((project) => {
-        return {
-          ...project.toObject(),
-          isFavorite: project.isFavorite.includes(user._id),
-        };
-      });
-    } catch (e) {
-      throw e;
+    if (isTeamLead) {
+      filter = {
+        teamLead: user._id,
+        companyID: user.companyID,
+      };
+    } else {
+      filter = {
+        'tasks.user': user._id,
+        companyID: user.companyID,
+      };
     }
+    const projects = await this.projectModel
+      .find(filter)
+      .select('isFavorite name isDone isOverdue')
+      .select('-tasks');
+
+    if (!projects) {
+      throw new NotFoundException('Проекты по вашему запросу не найдены!');
+    }
+
+    return projects.map((project) => {
+      return {
+        ...project.toObject(),
+        isFavorite: project.isFavorite.includes(user._id),
+      };
+    });
   }
 
   async getOne(user: UserDocument, id: Types.ObjectId) {
     const isTeamLead = user.roles.includes(Role.TeamLead);
-    let filter: FilterQuery<ProjectDocument> = {};
+    let filter: FilterQuery<ProjectDocument>;
 
     if (isTeamLead) {
       filter = {
