@@ -37,8 +37,8 @@ export class ProjectController {
   @Roles(Role.TeamLead, Role.User)
   @UseGuards(JWTGuard, RolesGuard)
   @Get()
-  get(@GetUser() user: UserDocument) {
-    return this.projectService.get(user);
+  get(@GetUser() user: UserDocument, @Query('teamId') teamId: string) {
+    return this.projectService.get(user, teamId);
   }
 
   @Roles(Role.TeamLead, Role.User)

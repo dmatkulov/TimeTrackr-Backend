@@ -96,7 +96,7 @@ export class FixturesService {
         photo: 'fixtures/avatars/dilshad.jpg',
         companyID: company._id,
         position: assignPosition(PositionEnum.Developer),
-        roles: Role.TeamLead,
+        roles: [Role.TeamLead, Role.User],
       },
       {
         email: 'admin@gmail.com',
