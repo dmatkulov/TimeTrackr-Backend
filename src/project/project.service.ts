@@ -57,7 +57,7 @@ export class ProjectService {
   async get(user: UserDocument, teamId: string) {
     const isTeamLead = user.roles.includes(Role.TeamLead);
 
-    let projects = [];
+    let projects: any[];
     const filter: FilterQuery<ProjectDocument> = {
       companyID: user.companyID,
     };
