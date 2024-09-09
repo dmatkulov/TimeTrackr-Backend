@@ -99,32 +99,28 @@ export class TeamService {
     id: Types.ObjectId,
     dto: UpdateTeamDto,
   ) {
-    try {
-      const filter: FilterQuery<TeamDocument> = {
-        _id: id,
-        companyID: user.companyID,
-        teamLead: user._id,
-      };
-      const existingTeam = await this.teamModel.findOne(filter);
+    const filter: FilterQuery<TeamDocument> = {
+      _id: id,
+      companyID: user.companyID,
+      teamLead: user._id,
+    };
+    const existingTeam = await this.teamModel.findOne(filter);
 
-      if (!existingTeam) {
-        throw new NotFoundException({ message: 'Команда не найдена' });
-      }
-
-      await this.teamModel.findOneAndUpdate(
-        filter,
-        {
-          $pull: {
-            members: { $in: dto.members.map((id) => new Types.ObjectId(id)) },
-          },
-        },
-        { new: true },
-      );
-
-      return { message: 'Участники удалены' };
-    } catch (e) {
-      throw new NotFoundException(e);
+    if (!existingTeam) {
+      throw new NotFoundException({ message: 'Команда не найдена' });
     }
+
+    await this.teamModel.findOneAndUpdate(
+      filter,
+      {
+        $pull: {
+          members: { $in: dto.members.map((id) => new Types.ObjectId(id)) },
+        },
+      },
+      { new: true },
+    );
+
+    return { message: 'Участники удалены' };
   }
 
   async update(user: UserDocument, id: Types.ObjectId, dto: UpdateTeamDto) {
@@ -189,6 +185,7 @@ export class TeamService {
       _id: id,
       companyID: user.companyID,
     };
+
     let update = {};
 
     if (existingTeam) {

@@ -29,6 +29,8 @@ import { ProjectService } from './project/project.service';
 import { ProjectController } from './project/project.controller';
 import * as process from 'node:process';
 import { Project, ProjectSchema } from './project/schema/project.schema';
+import { TasksService } from './tasks/tasks.service';
+import { TasksController } from './tasks/tasks.controller';
 
 @Module({
   imports: [
@@ -59,6 +61,7 @@ import { Project, ProjectSchema } from './project/schema/project.schema';
     PositionsController,
     CompanyController,
     ProjectController,
+    TasksController,
   ],
   providers: [
     AppService,
@@ -77,6 +80,7 @@ import { Project, ProjectSchema } from './project/schema/project.schema';
     CalculatorService,
     CompanyService,
     ProjectService,
+    TasksService,
   ],
 })
 export class AppModule {}

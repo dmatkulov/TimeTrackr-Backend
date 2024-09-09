@@ -237,5 +237,32 @@ export class FixturesService {
     });
 
     await project.save();
+
+    const project2 = new this.projectModel({
+      companyID: teamLead.companyID,
+      teamID: team,
+      teamLead: teamLead,
+      name: 'Web design',
+      description: 'Дизайн веб сайта',
+      deadline: '2024-11-01',
+      isFavorite: [members[0], members[1], members[2], members[3]],
+      type: ProjectEnum.NEW_PRODUCT_LAUNCH,
+      tasks: [
+        {
+          user: members[0],
+          executionDate: '2024-09-20',
+          title: 'Создать дизайн-систему',
+          timeExpected: '9h',
+        },
+        {
+          user: members[1],
+          executionDate: '2024-09-20',
+          title: 'Создать дизайн главной страницы',
+          timeExpected: '3h',
+        },
+      ],
+    });
+
+    await project2.save();
   }
 }

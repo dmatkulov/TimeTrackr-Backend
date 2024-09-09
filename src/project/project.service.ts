@@ -8,8 +8,8 @@ import { Project, ProjectDocument } from './schema/project.schema';
 import mongoose, { FilterQuery, Model, mongo, Types } from 'mongoose';
 import { UserDocument } from '../user/shema/user.schema';
 import { CreateProjectDto } from './dto/create-project.dto';
-import { TaskDto } from './dto/task.dto';
 import { Role } from '../utils/enums/role.enum';
+import { ToggleIsDoneDto } from '../tasks/dto/toggle-is-done.dto';
 
 @Injectable()
 export class ProjectService {
@@ -56,20 +56,23 @@ export class ProjectService {
 
   async get(user: UserDocument, teamId: string) {
     const isTeamLead = user.roles.includes(Role.TeamLead);
+    const isUser = user.roles.includes(Role.User);
 
-    let projects: any[];
-    const filter: FilterQuery<ProjectDocument> = {
+    let projects = [];
+    let filter: FilterQuery<ProjectDocument> = {
       companyID: user.companyID,
     };
 
-    if (teamId) {
-      filter.teamID = teamId;
-    }
-
-    if (isTeamLead) {
-      filter.teamLead = user._id;
-    } else {
-      filter['tasks.user'] = user._id;
+    if (isTeamLead && teamId) {
+      filter = { teamLead: user._id, teamID: teamId };
+    } else if (isTeamLead && !teamId) {
+      filter = { teamLead: user._id };
+    } else if (isUser && teamId) {
+      console.log('user team id');
+      filter = { 'tasks.user': user._id, teamID: teamId };
+    } else if (isUser && !teamId) {
+      console.log('user');
+      filter = { 'tasks.user': user._id };
     }
 
     if (teamId) {
@@ -81,10 +84,6 @@ export class ProjectService {
         .find(filter)
         .select('isFavorite name')
         .select('-tasks');
-    }
-
-    if (!projects) {
-      throw new NotFoundException('Проекты по вашему запросу не найдены!');
     }
 
     if (teamId) {
@@ -129,68 +128,43 @@ export class ProjectService {
       throw new NotFoundException();
     }
 
-    // return projects.map((project) => {
-    //   const tasksArray = project.tasks || [];
-    //   const filteredTasks = Array.isArray(tasksArray)
-    //     ? tasksArray.filter(
-    //       (task) => task.user._id.toString() === user._id.toString(),
-    //     )
-    //     : [];
-    //
-    //   return {
-    //     ...project.toObject(),
-    //     isFavorite: project.isFavorite.includes(user._id),
-    //     tasks: filteredTasks.length,
-    //   };
-    // });
     return {
       ...project.toObject(),
       isFavorite: project.isFavorite.includes(user._id),
     };
   }
 
-  async getTask(id: Types.ObjectId, taskId: string) {
-    let filter: FilterQuery<ProjectDocument> = {};
+  async toggleFavourite(user: UserDocument, id: Types.ObjectId) {
+    const existingProject = await this.projectModel.findOne({
+      _id: id,
+      companyID: user.companyID,
+      isFavorite: user._id,
+    });
 
-    if (taskId) {
-      filter = {
-        _id: id,
-        'tasks._id': new Types.ObjectId(taskId),
+    let update = {};
+
+    if (existingProject) {
+      update = {
+        $pull: { isFavorite: user._id },
+      };
+    } else {
+      update = {
+        $addToSet: { isFavorite: user._id },
       };
     }
 
-    const task = await this.projectModel.findOne(filter, { 'tasks.$': 1 });
-
-    if (!task) {
-      throw new NotFoundException();
-    }
-
-    return task;
+    return this.projectModel.findByIdAndUpdate(id, update);
   }
 
-  async addTasks(dto: TaskDto[], id: Types.ObjectId) {
-    try {
-      return await this.projectModel.updateOne(
-        { _id: id },
-        {
-          $push: {
-            tasks: {
-              $each: dto,
-            },
-          },
-        },
-        { new: true },
-      );
-    } catch (e) {
-      if (e instanceof mongoose.Error.ValidationError) {
-        throw new UnprocessableEntityException(e);
-      }
-
-      if (e instanceof mongoose.Error.ValidationError) {
-        throw new NotFoundException(e);
-      }
-
-      throw e;
-    }
+  async toggleIsDone(user: UserDocument, teamId: string, dto: ToggleIsDoneDto) {
+    await this.projectModel.updateMany(
+      {
+        _id: { $in: dto.projects },
+        companyID: user.companyID,
+        teamID: new Types.ObjectId(teamId),
+      },
+      { $set: { isDone: dto.value } },
+      { new: true },
+    );
   }
 }

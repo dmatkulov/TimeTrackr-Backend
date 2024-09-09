@@ -4,7 +4,7 @@ import { Company } from '../../company/schema/company.schema';
 import { User } from '../../user/shema/user.schema';
 import { Team } from '../../team/schema/team.schema';
 import { ProjectEnum } from '../../utils/enums/project.enum';
-import { TaskDto } from '../dto/task.dto';
+import { TaskDto } from '../../tasks/dto/task.dto';
 import { Type } from 'class-transformer';
 import { StatusEnum } from '../../utils/enums/status.enum';
 
@@ -31,18 +31,18 @@ export class Project {
   })
   teamLead: mongoose.Schema.Types.ObjectId;
 
+  @Prop({ required: true })
+  name: string;
+
+  @Prop()
+  description?: string;
+
   @Prop({
     required: true,
     type: Date,
     default: () => new Date(),
   })
   deadline: Date;
-
-  @Prop({ required: true, unique: true })
-  name: string;
-
-  @Prop()
-  description?: string;
 
   @Prop({ required: true, default: ProjectEnum.NEW_PRODUCT_LAUNCH })
   type: ProjectEnum;
