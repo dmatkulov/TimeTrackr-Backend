@@ -7,6 +7,7 @@ import { ProjectEnum } from '../../utils/enums/project.enum';
 import { TaskDto } from '../../tasks/dto/task.dto';
 import { Type } from 'class-transformer';
 import { StatusEnum } from '../../utils/enums/status.enum';
+import { TypeEnum } from '../../utils/enums/type.enum';
 
 @Schema()
 export class Project {
@@ -76,6 +77,14 @@ export class Project {
         default: StatusEnum.TODO,
         required: true,
       },
+
+      type: {
+        type: String,
+        enum: Object.values(TypeEnum),
+        default: TypeEnum.NEW_TASK,
+        required: true,
+      },
+
       timeExpected: {
         type: String,
       },

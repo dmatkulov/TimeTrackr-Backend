@@ -104,6 +104,7 @@ export class TeamService {
       companyID: user.companyID,
       teamLead: user._id,
     };
+
     const existingTeam = await this.teamModel.findOne(filter);
 
     if (!existingTeam) {

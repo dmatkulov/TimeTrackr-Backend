@@ -10,6 +10,7 @@ import { Company, CompanyDocument } from '../company/schema/company.schema';
 import { Team, TeamDocument } from '../team/schema/team.schema';
 import { Project, ProjectDocument } from '../project/schema/project.schema';
 import { ProjectEnum } from '../utils/enums/project.enum';
+import { TypeEnum } from '../utils/enums/type.enum';
 
 @Injectable()
 export class FixturesService {
@@ -252,13 +253,32 @@ export class FixturesService {
           user: members[0],
           executionDate: '2024-09-20',
           title: 'Создать дизайн-систему',
+          description: 'Инетересная задача',
           timeExpected: '9h',
         },
         {
           user: members[1],
           executionDate: '2024-09-20',
           title: 'Создать дизайн главной страницы',
+          description: 'Инетересная задача',
           timeExpected: '3h',
+          type: TypeEnum.IMPROVEMENT,
+        },
+        {
+          user: members[1],
+          executionDate: '2024-09-20',
+          title: 'Создать дизайн главной страницы',
+          description: 'Инетересная задача',
+          timeExpected: '3h',
+          type: TypeEnum.BUG,
+        },
+        {
+          user: members[2],
+          executionDate: '2024-09-20',
+          title: 'Создать дизайн главной страницы',
+          description: 'Инетересная задача',
+          timeExpected: '3h',
+          type: TypeEnum.HANDOVER,
         },
       ],
     });

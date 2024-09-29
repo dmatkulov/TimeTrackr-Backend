@@ -54,6 +54,48 @@ export class ProjectService {
     }
   }
 
+  async update(dto: CreateProjectDto, id: Types.ObjectId) {
+    try {
+      const update = {
+        teamID: dto.teamID,
+        name: dto.name,
+        description: dto.description,
+        deadline: new Date(dto.deadline),
+        type: dto.type,
+      };
+
+      await this.projectModel.findByIdAndUpdate(id, update);
+    } catch (e) {
+      if (e instanceof mongo.MongoServerError && e.code === 11000) {
+        const error = {
+          message: [
+            {
+              property: 'name',
+              message: 'Введите уникальное название команды',
+            },
+          ],
+          error: 'Unprocessable Entity',
+          statusCode: 422,
+        };
+        throw new UnprocessableEntityException(error);
+      }
+
+      if (e instanceof mongoose.Error.ValidationError) {
+        throw new UnprocessableEntityException(e);
+      }
+
+      throw e;
+    }
+  }
+
+  async delete(id: Types.ObjectId) {
+    try {
+      return this.projectModel.findByIdAndDelete(id);
+    } catch (e) {
+      throw new NotFoundException(e);
+    }
+  }
+
   async get(user: UserDocument, teamId: string) {
     const isTeamLead = user.roles.includes(Role.TeamLead);
     const isUser = user.roles.includes(Role.User);
@@ -68,17 +110,15 @@ export class ProjectService {
     } else if (isTeamLead && !teamId) {
       filter = { teamLead: user._id };
     } else if (isUser && teamId) {
-      console.log('user team id');
       filter = { 'tasks.user': user._id, teamID: teamId };
     } else if (isUser && !teamId) {
-      console.log('user');
       filter = { 'tasks.user': user._id };
     }
 
     if (teamId) {
       projects = await this.projectModel
         .find(filter)
-        .select('name isDone tasks deadline type');
+        .select('name isDone tasks deadline type teamID description');
     } else {
       projects = await this.projectModel
         .find(filter)
@@ -119,18 +159,31 @@ export class ProjectService {
       };
     }
 
-    const project = await this.projectModel.findOne(filter).populate({
-      path: 'tasks.user',
-      select: 'firstname lastname photo position',
-    });
+    const project = await this.projectModel
+      .findOne(filter)
+      .populate({
+        path: 'tasks.user',
+        select: 'firstname lastname photo position',
+        populate: {
+          path: 'position',
+        },
+      })
+      .select('name isDone tasks deadline type teamID description isFavorite');
 
     if (!project) {
       throw new NotFoundException();
     }
 
-    return {
+    const result = {
       ...project.toObject(),
       isFavorite: project.isFavorite.includes(user._id),
+    };
+
+    const { tasks, ...rest } = result;
+
+    return {
+      project: rest,
+      tasks,
     };
   }
 

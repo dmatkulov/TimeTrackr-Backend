@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -49,6 +50,23 @@ export class ProjectController {
     @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
   ) {
     return this.projectService.getOne(user, id);
+  }
+
+  @Roles(Role.TeamLead)
+  @UseGuards(JWTGuard, RolesGuard)
+  @Patch('update/:id')
+  update(
+    @Param('id', ParseObjectIdPipe) id: Types.ObjectId,
+    @Body() dto: CreateProjectDto,
+  ) {
+    return this.projectService.update(dto, id);
+  }
+
+  @Roles(Role.TeamLead)
+  @UseGuards(JWTGuard, RolesGuard)
+  @Delete('delete/:id')
+  delete(@Param('id', ParseObjectIdPipe) id: Types.ObjectId) {
+    return this.projectService.delete(id);
   }
 
   @Roles(Role.User, Role.TeamLead)
