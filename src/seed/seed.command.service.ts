@@ -17,14 +17,23 @@ export class SeedCommandService {
     await mongoose.connect('mongodb://localhost/trckr');
     const db = mongoose.connection;
 
-    const collections = ['positions', 'users'];
+    const collections = [
+      'positions',
+      'companies',
+      'users',
+      'teams',
+      'projects',
+    ];
 
     for (const collectionsName of collections) {
       await this.dropCollection(db, collectionsName);
     }
 
     await this.fixturesService.seedPositions();
+    await this.fixturesService.seedCompany();
     await this.fixturesService.seedUsers();
+    await this.fixturesService.seedTeams();
+    await this.fixturesService.seedProjects();
 
     await this.closeConnection(db);
   }

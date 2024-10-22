@@ -1,5 +1,5 @@
 export enum PositionEnum {
-  Lead = 'Тимлид',
+  Admin = 'Админ',
   Developer = 'Разработчик',
   Designer = 'Дизайнер',
   Tester = 'Тестировщик',

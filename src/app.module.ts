@@ -10,9 +10,6 @@ import { CommandModule } from 'nestjs-command';
 import { Position, PositionSchema } from './position/schema/position.schema';
 import { PositionsService } from './position/positions.service';
 import { PositionsController } from './position/positions.controller';
-import { Task, TaskSchema } from './task/shema/task.schema';
-import { TaskService } from './task/task.service';
-import { TaskController } from './task/task.controller';
 import { JWTGuard } from './utils/guards/token.guard';
 import { FixturesService } from './seed/fixtures.service';
 import { SeedCommandService } from './seed/seed.command.service';
@@ -25,15 +22,27 @@ import { TeamService } from './team/team.service';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { Team, TeamSchema } from './team/schema/team.schema';
+import { CompanyService } from './company/company.service';
+import { CompanyController } from './company/company.controller';
+import { Company, CompanySchema } from './company/schema/company.schema';
+import { ProjectService } from './project/project.service';
+import { ProjectController } from './project/project.controller';
+import * as process from 'node:process';
+import { Project, ProjectSchema } from './project/schema/project.schema';
+import { TasksService } from './tasks/tasks.service';
+import { TasksController } from './tasks/tasks.controller';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost/trckr'),
+    MongooseModule.forRoot(
+      process.env.MONGO_DB_URL || 'mongodb://localhost/trckr',
+    ),
+    MongooseModule.forFeature([{ name: Company.name, schema: CompanySchema }]),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([
       { name: Position.name, schema: PositionSchema },
     ]),
-    MongooseModule.forFeature([{ name: Task.name, schema: TaskSchema }]),
+    MongooseModule.forFeature([{ name: Project.name, schema: ProjectSchema }]),
     MongooseModule.forFeature([{ name: Team.name, schema: TeamSchema }]),
     PassportModule,
     CommandModule,
@@ -50,7 +59,9 @@ import { Team, TeamSchema } from './team/schema/team.schema';
     TeamController,
 
     PositionsController,
-    TaskController,
+    CompanyController,
+    ProjectController,
+    TasksController,
   ],
   providers: [
     AppService,
@@ -63,11 +74,13 @@ import { Team, TeamSchema } from './team/schema/team.schema';
 
     TeamService,
     PositionsService,
-    TaskService,
 
     SeedCommandService,
     FixturesService,
     CalculatorService,
+    CompanyService,
+    ProjectService,
+    TasksService,
   ],
 })
 export class AppModule {}

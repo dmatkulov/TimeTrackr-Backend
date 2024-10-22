@@ -1,17 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { User } from '../../user/shema/user.schema';
-import { Type } from 'class-transformer';
-import { CreateTeamDto } from '../dto/create-team.dto';
-import { Position } from '../../position/schema/position.schema';
+import { Company } from '../../company/schema/company.schema';
 
 @Schema()
 export class Team {
-  @Prop({ required: true, unique: true })
-  name: string;
-
-  @Prop({ required: false })
-  description: string;
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: Company.name,
+    required: true,
+  })
+  companyID: mongoose.Schema.Types.ObjectId;
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
@@ -20,25 +19,23 @@ export class Team {
   })
   teamLead: mongoose.Schema.Types.ObjectId;
 
-  @Prop({ type: Boolean, default: false })
-  isFavorite: boolean;
+  @Prop({ required: true, unique: true })
+  name: string;
 
-  @Prop([
-    {
-      user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: User.name,
-        required: true,
-      },
-      position: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: Position.name,
-        required: true,
-      },
-    },
-  ])
-  @Type(() => CreateTeamDto)
-  members: CreateTeamDto[];
+  @Prop({ required: false })
+  description: string;
+
+  @Prop({ type: String })
+  icon: string;
+
+  @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: User.name }])
+  isFavorite: mongoose.Schema.Types.ObjectId[];
+
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: User.name }],
+    required: true,
+  })
+  members: mongoose.Schema.Types.ObjectId[];
 }
 
 export const TeamSchema = SchemaFactory.createForClass(Team);

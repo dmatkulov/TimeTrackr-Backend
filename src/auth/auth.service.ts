@@ -10,8 +10,9 @@ import mongoose, { Model, mongo } from 'mongoose';
 import { Request } from 'express';
 import { randomUUID } from 'crypto';
 import { OAuth2Client } from 'google-auth-library';
-import { Position, PositionDocument } from '../position/schema/position.schema';
 import { AuthDto } from './auth.dto';
+import { Role } from '../utils/enums/role.enum';
+import { Company, CompanyDocument } from '../company/schema/company.schema';
 
 const client = new OAuth2Client(process.env['GOOGLE_CLIENT_ID']);
 
@@ -20,8 +21,9 @@ export class AuthService {
   constructor(
     @InjectModel(User.name)
     private userModel: Model<UserDocument>,
-    @InjectModel(Position.name)
-    private positionModel: Model<PositionDocument>,
+
+    @InjectModel(Company.name)
+    private companyModel: Model<CompanyDocument>,
   ) {}
 
   async validateUser(
@@ -44,14 +46,20 @@ export class AuthService {
     throw new UnauthorizedException('Введите корректные данные!');
   }
 
-  async register(file: Express.Multer.File, createUserDto: AuthDto) {
+  async register(createUserDto: AuthDto) {
     try {
+      const company = await this.companyModel.findOne({
+        companyID: createUserDto.companyID,
+      });
+
       const newUser = new this.userModel({
         email: createUserDto.email,
         password: createUserDto.password,
         firstname: createUserDto.firstname,
         lastname: createUserDto.lastname,
-        roles: createUserDto.role,
+        companyID: company._id,
+        position: createUserDto.position,
+        roles: createUserDto.roles || [Role.User],
       });
 
       newUser.generateToken();

@@ -1,8 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { compare, genSalt, hash } from 'bcrypt';
-import { Document } from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 import * as jwt from 'jsonwebtoken';
 import { Role } from '../../utils/enums/role.enum';
+import { Company } from '../../company/schema/company.schema';
+import { Position } from '../../position/schema/position.schema';
 
 const SALT_WORK_FACTOR = 10;
 const JWT_SECRET = process.env.SECRET_KEY || 'secret_KEY';
@@ -13,6 +15,10 @@ export interface UserMethods {
 
   checkPassword(password: string): Promise<boolean>;
 }
+
+const validateGoogleUser = function (this: UserDocument) {
+  return !this.googleID;
+};
 
 @Schema()
 export class User {
@@ -43,6 +49,20 @@ export class User {
   })
   roles: Role[];
 
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: Company.name,
+    required: validateGoogleUser,
+  })
+  companyID: mongoose.Schema.Types.ObjectId;
+
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: Position.name,
+    required: validateGoogleUser,
+  })
+  position: mongoose.Schema.Types.ObjectId;
+
   @Prop({ required: false, type: String })
   googleID?: string;
 }
@@ -50,7 +70,7 @@ export class User {
 export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.methods.generateToken = function () {
-  const payload = { role: this._id, _id: this._id, email: this.email };
+  const payload = { roles: this.roles, _id: this._id, email: this.email };
   this.token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRATION });
 };
 

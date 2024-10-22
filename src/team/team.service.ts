@@ -1,36 +1,28 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { FilterQuery, Model, mongo, Types } from 'mongoose';
 import { Team, TeamDocument } from './schema/team.schema';
 import { CreateTeamDto } from './dto/create-team.dto';
-import { User, UserDocument } from '../user/shema/user.schema';
+import { UserDocument } from '../user/shema/user.schema';
 import { Role } from '../utils/enums/role.enum';
-import { ToggleFavouriteDto } from './dto/toggle-favourite.dto';
+import { UpdateTeamDto } from './dto/update-team.dto';
 
 @Injectable()
 export class TeamService {
   @InjectModel(Team.name)
   private teamModel: Model<TeamDocument>;
 
-  @InjectModel(User.name)
-  private userModel: Model<UserDocument>;
-
   async create(user: UserDocument, dto: CreateTeamDto) {
-    const teamLead = await this.userModel.findOneAndUpdate(
-      { _id: user._id },
-      { $addToSet: { roles: Role.TeamLead } },
-      { new: true },
-    );
-
-    if (!teamLead) {
-      throw new UnprocessableEntityException('Пользователь не найден');
-    }
-
     try {
       const team = await this.teamModel.create({
         name: dto.name,
         description: dto.description,
         teamLead: user._id,
+        companyID: user.companyID,
         members: dto.members,
       });
 
@@ -60,48 +52,163 @@ export class TeamService {
     }
   }
 
-  async get(user: UserDocument, teamList: string) {
-    const userID = user._id;
+  async get(user: UserDocument, userTeams: string) {
+    const isTeamLead = user.roles.includes(Role.TeamLead);
+    const isUser = user.roles.includes(Role.User);
 
-    let teams: TeamDocument[];
+    const filter: FilterQuery<TeamDocument> = { companyID: user.companyID };
+
+    if (isTeamLead) {
+      filter.teamLead = user._id;
+    } else if (isUser) {
+      filter.members = user._id;
+    } else if (userTeams) {
+      filter.members = userTeams;
+    }
+
+    const teams = await this.teamModel
+      .find(filter)
+      .populate({
+        path: 'members',
+        select: 'firstname lastname photo',
+      })
+      .exec();
+
+    return teams.map((team: TeamDocument) => {
+      return {
+        ...team.toObject(),
+        isFavorite: team.isFavorite.includes(user._id),
+      };
+    });
+  }
+
+  async getOne(user: UserDocument, id: Types.ObjectId) {
+    return this.teamModel
+      .findOne({ _id: id, companyID: user.companyID })
+      .populate({
+        path: 'members',
+        select: 'firstname lastname photo position',
+        populate: {
+          path: 'position',
+        },
+      });
+  }
+
+  async deleteMembers(
+    user: UserDocument,
+    id: Types.ObjectId,
+    dto: UpdateTeamDto,
+  ) {
     const filter: FilterQuery<TeamDocument> = {
-      $or: [{ teamLead: userID }, { 'members.user': userID }],
+      _id: id,
+      companyID: user.companyID,
+      teamLead: user._id,
     };
 
-    if (teamList) {
-      teams = await this.teamModel
-        .find(filter)
-        .select('name isFavorite')
-        .sort({ isFavorite: -1 });
-    } else {
-      teams = await this.teamModel
-        .find(filter)
-        .populate({
-          path: 'members',
-          populate: [
-            {
-              path: 'user',
-              select: 'firstname lastname photo',
-            },
-            {
-              path: 'position',
-            },
-          ],
-        })
-        .sort({ isFavorite: -1 });
+    const existingTeam = await this.teamModel.findOne(filter);
+
+    if (!existingTeam) {
+      throw new NotFoundException({ message: 'Команда не найдена' });
     }
-    return teams;
-  }
 
-  async getOne(id: Types.ObjectId) {
-    return this.teamModel.findById(id).sort({ isFavorite: -1 });
-  }
-
-  async toggleFavourite(id: Types.ObjectId, dto: ToggleFavouriteDto) {
     await this.teamModel.findOneAndUpdate(
-      { _id: id },
-      { $set: { isFavorite: dto.isFavorite } },
+      filter,
+      {
+        $pull: {
+          members: { $in: dto.members.map((id) => new Types.ObjectId(id)) },
+        },
+      },
       { new: true },
     );
+
+    return { message: 'Участники удалены' };
+  }
+
+  async update(user: UserDocument, id: Types.ObjectId, dto: UpdateTeamDto) {
+    try {
+      const filter: FilterQuery<TeamDocument> = {
+        _id: id,
+        companyID: user.companyID,
+        teamLead: user._id,
+      };
+
+      await this.teamModel.findOne(filter);
+
+      if (dto.members) {
+        await this.teamModel.findOneAndUpdate(
+          filter,
+          { $addToSet: { members: { $each: dto.members } } },
+          { new: true },
+        );
+        return { message: 'Новые участники успешно добавлены' };
+      } else if (dto.name || dto.description) {
+        await this.teamModel.findOneAndUpdate(
+          filter,
+          { $set: { name: dto.name, description: dto.description } },
+          { new: true },
+        );
+
+        return { message: 'Изменения успешно внесены' };
+      }
+    } catch (e) {
+      if (e instanceof mongoose.Error.ValidationError) {
+        throw new UnprocessableEntityException(e);
+      }
+
+      if (e instanceof mongoose.Error.DocumentNotFoundError) {
+        throw new NotFoundException({ message: 'Команда не найдена' });
+      }
+
+      throw e;
+    }
+  }
+
+  async delete(user: UserDocument, id: Types.ObjectId) {
+    try {
+      await this.teamModel.findByIdAndDelete({
+        _id: id,
+        companyID: user.companyID,
+        isFavorite: user._id,
+      });
+    } catch (e) {
+      throw new NotFoundException(e);
+    }
+  }
+
+  async toggleFavourite(user: UserDocument, id: Types.ObjectId) {
+    const existingTeam = await this.teamModel.findOne({
+      _id: id,
+      companyID: user.companyID,
+      isFavorite: user._id,
+    });
+
+    const filter: FilterQuery<TeamDocument> = {
+      _id: id,
+      companyID: user.companyID,
+    };
+
+    let update = {};
+
+    if (existingTeam) {
+      update = {
+        $pull: { isFavorite: user._id },
+      };
+    } else {
+      update = {
+        $addToSet: { isFavorite: user._id },
+      };
+    }
+    const result = await this.teamModel
+      .findOneAndUpdate(filter, update, { new: true })
+      .populate({
+        path: 'members',
+        select: 'firstname lastname photo',
+      })
+      .exec();
+
+    return {
+      ...result.toObject(),
+      isFavorite: result.isFavorite.includes(user._id),
+    };
   }
 }

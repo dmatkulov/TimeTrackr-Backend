@@ -1,11 +1,12 @@
 import {
+  ArrayNotEmpty,
+  IsArray,
+  IsMongoId,
   IsNotEmpty,
   IsOptional,
   IsString,
-  ValidateNested,
 } from 'class-validator';
-import { TeamMembersDto } from './team-members.dto';
-import { Type } from 'class-transformer';
+import { Types } from 'mongoose';
 
 export class CreateTeamDto {
   @IsString()
@@ -15,7 +16,8 @@ export class CreateTeamDto {
   @IsOptional()
   description: string;
 
-  @ValidateNested({ each: true })
-  @Type(() => TeamMembersDto)
-  members: TeamMembersDto[];
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsMongoId({ each: true })
+  members: Types.ObjectId[];
 }
